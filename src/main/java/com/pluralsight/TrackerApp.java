@@ -21,20 +21,22 @@ public class TrackerApp {
 
 
     private static void mainMenu() {
-        String prompt =
-                """
-                        ========================================
-                                WELCOME TO ONLINE STORE
-                        ========================================
-                        
-                        Please choose an option:
-                        
-                        D) Add Deposit
-                        P) Make Payment(Debit)
-                        L) Ledger
-                        X) Exit
-                        
-                        Enter your choice:\s""";
+        String prompt = """
+╔══════════════════════════════════════════════╗
+║            LEDGERPRO FINANCE HUB            ║
+╠══════════════════════════════════════════════╣
+║   Track deposits, payments, and history     ║
+╚══════════════════════════════════════════════╝
+
+             MAIN MENU
+----------------------------------------------
+[D] Add Deposit
+[P] Make Payment (Debit)
+[L] View Ledger
+[X] Exit Application
+----------------------------------------------
+Enter your choice: 
+""";
 
         boolean running = true;
 
@@ -119,21 +121,23 @@ public class TrackerApp {
 
 
     private static void ledgerMenu() {
-        String prompt =
-                """
-                         ========================================
-                                         Ledger
-                         ========================================
-                        \s
-                         Please choose an option:
-                        \s
-                         A) All
-                         D) Deposits
-                         P) Payments
-                         R) Reports
-                         H) Home
-                        \s
-                         Enter your choice:\s""";
+        String prompt = """
+╔══════════════════════════════════════════════╗
+║               LEDGER CENTER                 ║
+╠══════════════════════════════════════════════╣
+║      Review transactions and reports        ║
+╚══════════════════════════════════════════════╝
+
+                LEDGER MENU
+------------------------------------------------
+[A] View All Transactions
+[D] View Deposits
+[P] View Payments
+[R] Open Reports
+[H] Return Home
+------------------------------------------------
+Enter your choice:
+""";
 
         boolean running = true;
 
@@ -167,22 +171,24 @@ public class TrackerApp {
     }
 
     private static void showReportMenu() {
-        String prompt =
-                """
-                         ========================================
-                                         Reports
-                         ========================================
-                        \s
-                         Please choose an option:
-                        \s
-                         1) Month to Date
-                         2) Previous Month
-                         3) Year To Year
-                         4) Previous Year
-                         5) Search by Vendor
-                         0) Back
-                        \s
-                         Enter your choice:\s""";
+        String prompt = """
+╔══════════════════════════════════════════════╗
+║              LEDGERPRO FINANCE HUB          ║
+╠══════════════════════════════════════════════╣
+║          Reporting and search tools         ║
+╚══════════════════════════════════════════════╝
+
+                REPORTS MENU
+------------------------------------------------
+[1] Month To Date
+[2] Previous Month
+[3] Year To Date
+[4] Previous Year
+[5] Search By Vendor
+[0] Return to Ledger
+------------------------------------------------
+Enter your choice:
+""";
 
         boolean running = true;
 
