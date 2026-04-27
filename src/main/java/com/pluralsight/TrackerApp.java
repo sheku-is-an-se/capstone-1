@@ -10,6 +10,7 @@ public class TrackerApp {
     static Scanner scanner = new Scanner(System.in);
 
 
+
     public static void main(String[] args) {
         mainMenu();
         System.out.println("Thank you, come back soon!");
