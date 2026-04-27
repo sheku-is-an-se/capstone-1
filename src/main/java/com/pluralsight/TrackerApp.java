@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class TrackerApp {
     static Scanner scanner = new Scanner(System.in);
-    ArrayList<Transactions> transactions = new ArrayList<>();
+    public static ArrayList<Transactions> transactions = new ArrayList<>();
     public static final String TRANSACTIONS_FILE_NAME = "src/main/resources/products.csv";
 
 
@@ -110,7 +110,6 @@ public class TrackerApp {
                     break;
                 case "H":
                     running = false;
-                    mainMenu();
                     break;
                 default:
                     System.err.println(("Oops! That wasn't a valid option."));
@@ -164,8 +163,7 @@ public class TrackerApp {
                         //searchByVendor();
                         break;
                     case "0": //Go back to ledger menu
-                        running = false;
-                        ledgerMenu();
+                        running = false;;
                     default:
                         System.err.println(("Oops! That wasn't a valid option."));
                         break;
