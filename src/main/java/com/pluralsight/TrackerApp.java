@@ -17,7 +17,6 @@ public class TrackerApp {
         mainMenu();
         System.out.println("Thank you, come back soon!");
 
-        FileReader fileReader = new FileReader()
 
 
     }
@@ -51,10 +50,11 @@ public class TrackerApp {
 
             switch (userMenu) {
                 case "D":
-                    //DisplayProduct();
+                    //addDeposit();
                     break;
                 case "P":
                     System.out.println("Make Payment");
+                    //makePayment();
                     break;
                 case "L":
                     ledgerMenu();
@@ -100,15 +100,12 @@ public class TrackerApp {
                 case "A":
                     //DisplayProduct();
                     break;
-                case "D":
-                    System.out.println("Deposits");
+                case "D": //deposits
+                    //depositTransaction();
                     break;
-                case "P":
-                    System.out.println("Payments.");
-                    running = false;
+                case "P": //payements
                     break;
                 case "R":
-                    running = false;
                     showReportMenu();
                     break;
                 case "H":
@@ -132,11 +129,11 @@ public class TrackerApp {
                            \s
                             Please choose an option:
                            \s
-                            1) All
-                            2) Deposits
-                            3) Payments
-                            4) Reports
-                            5) Home
+                            1) Month to Date
+                            2) Previous Month
+                            3) Year To Year
+                            4) Previous Year
+                            5) Search by Vendor
                             0) Back
                            \s
                             Enter your choice:\s""";
@@ -150,24 +147,25 @@ public class TrackerApp {
                 String userMenu = scanner.nextLine();
 
                 switch (userMenu) {
-                    case "A":
-                        //DisplayProduct();
+                    case "1":
+                        //MonthtoMonth
+                        //monthToMonth();
                         break;
-                    case "D":
-                        System.out.println("Deposits");
+                    case "2":
+                        //previousMonth();
                         break;
-                    case "P":
-                        System.out.println("Payments.");
+                    case "3":
+                        //yearToYear();
+                        break;
+                    case "4": //previous year
+                        //showReports();
+                        break;
+                    case "5":
+                        //searchByVendor();
+                        break;
+                    case "0": //Go back to ledger menu
                         running = false;
-                        break;
-                    case "R":
-                        running = false;
-                        showReports();
-                        break;
-                    case "H":
-                        running = false;
-                        mainMenu();
-                        break;
+                        ledgerMenu();
                     default:
                         System.err.println(("Oops! That wasn't a valid option."));
                         break;
