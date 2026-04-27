@@ -15,23 +15,23 @@ public class Transactions {
         this.amount = amount;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public String getDate() {
+        return date;
     }
 
-    public void setTime(String time) {
-        this.time = time;
+    public String getTime() {
+        return time;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public String getDescription() {
+        return description;
     }
 
-    public void setVendor(String vendor) {
-        this.vendor = vendor;
+    public String getVendor() {
+        return vendor;
     }
 
-    public void setAmount(double amount) {
-        this.amount = amount;
+    public double getAmount() {
+        return amount;
     }
 }
