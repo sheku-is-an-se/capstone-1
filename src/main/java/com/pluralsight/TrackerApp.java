@@ -346,7 +346,7 @@ public class TrackerApp {
                     //displayReport(2)
                     break;
                 case "3":
-                    //displayReport(3);
+                    yearToDate();
                     break;
                 case "4": //previous year
                     displayPreviousYear();
@@ -364,6 +364,18 @@ public class TrackerApp {
         } while (running);
 
 
+    }
+
+    private static void yearToDate() {
+        LocalDate today = LocalDate.now();
+        int currentYear = today.getYear();
+        ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
+        for (Transaction t : transactions) {
+            int transactionYear = t.getDate().getYear();
+            if (transactionYear == currentYear && !t.getDate().isAfter(today)) {
+                printTransaction(t);
+            }
+        }
     }
 
     private static void displayPreviousYear() {
@@ -410,4 +422,5 @@ public class TrackerApp {
 
 
 }
+
 
