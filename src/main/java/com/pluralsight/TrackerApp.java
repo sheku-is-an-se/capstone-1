@@ -2,6 +2,9 @@
 package com.pluralsight;
 
 import java.io.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -22,21 +25,21 @@ public class TrackerApp {
 
     private static void mainMenu() {
         String prompt = """
-╔══════════════════════════════════════════════╗
-║            LEDGERPRO FINANCE HUB            ║
-╠══════════════════════════════════════════════╣
-║   Track deposits, payments, and history     ║
-╚══════════════════════════════════════════════╝
-
-             MAIN MENU
-----------------------------------------------
-[D] Add Deposit
-[P] Make Payment (Debit)
-[L] View Ledger
-[X] Exit Application
-----------------------------------------------
-Enter your choice: 
-""";
+                ╔══════════════════════════════════════════════╗
+                ║            LEDGERPRO FINANCE HUB            ║
+                ╠══════════════════════════════════════════════╣
+                ║   Track deposits, payments, and history     ║
+                ╚══════════════════════════════════════════════╝
+                
+                             MAIN MENU
+                ----------------------------------------------
+                [D] Add Deposit
+                [P] Make Payment (Debit)
+                [L] View Ledger
+                [X] Exit Application
+                ----------------------------------------------
+                Enter your choice: 
+                """;
 
         boolean running = true;
 
@@ -48,10 +51,11 @@ Enter your choice:
             switch (userMenu) {
                 case "D":
                     addDeposit();
+                    System.out.println("Your deposit was successfully submitted!!");
                     break;
                 case "P":
-                    System.out.println("Make Payment");
-                    //makePayment();
+                    makePayment();
+                    System.out.println("Your payment was successfully submitted!!");
                     break;
                 case "L":
                     ledgerMenu();
@@ -73,25 +77,100 @@ Enter your choice:
 
 
         try {
+            fileWriter = new FileWriter(TRANSACTIONS_FILE_NAME, true);
+            bufferedWriter = new BufferedWriter(fileWriter);
+
+            //prompt user for description
+            System.out.println("What's the description of the payment?");
+            String depDesc = scanner.nextLine();
+            //prompt user for vendor information
+            System.out.println("Who's the vendor for this payment?");
+            String depVend = scanner.nextLine();
+            //prompt user for amount
+            System.out.println("What's the amount?");
+            String payment = scanner.nextLine();
+            Double depAmount = Double.parseDouble(payment);
+
+            //Create the formatter with the pattern I want
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            //Get the current Date
+            LocalDate today = LocalDate.now();
+            //Format it and store it into a string
+            String formattedDate = today.format(formatter);
+
+            //Get the current Time
+            LocalTime now = LocalTime.now();
+            //Create pattern
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+            //Format it and store it into a string
+            String formattedTime = now.format(timeFormatter);
+
+
+            // Create the format that is going to enter products.csv
+            String trans = formattedDate + "|" + formattedTime + "|" + depDesc + "|" + depVend + "|" + depAmount;
+
+
+            //Write to file
+            bufferedWriter.write(trans);
+
+            //Make new space for the next deposit(go to the next line)
+            bufferedWriter.newLine();
+            //close bufferedWriter
+            bufferedWriter.close();
+
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    private static void makePayment() {
+        FileWriter fileWriter;
+        BufferedWriter bufferedWriter;
+
+
+        try {
             fileWriter = new FileWriter(TRANSACTIONS_FILE_NAME,true);
             bufferedWriter = new BufferedWriter(fileWriter);
 
-
+            //prompt user for description
             System.out.println("What's the description of the payment?");
             String payDesc = scanner.nextLine();
-
+            //prompt user for vendor information
             System.out.println("Who's the vendor for this payment?");
             String payVend = scanner.nextLine();
-
+            //prompt user for amount
             System.out.println("What's the amount?");
-            Double payAmount = scanner.nextDouble();
+            String payment = scanner.nextLine();
+            Double payAmount = Double.parseDouble(payment);
 
-            String trans  =  payDesc + "|" + payVend + "|" + payAmount;
+            //Create the formatter with the pattern I want
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            //Get the current Date
+            LocalDate today = LocalDate.now();
+            //Format it and store it into a string
+            String formattedDate = today.format(formatter);
+
+            //Get the current Time
+            LocalTime now = LocalTime.now();
+            //Create pattern
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+            //Format it and store it into a string
+            String formattedTime = now.format(timeFormatter);
 
 
 
+            // Create the format that is going to enter products.csv
+            String trans  =  formattedDate + "|" + formattedTime +  "|" + payDesc + "|" + payVend + "|" + "-" + payAmount;
+
+
+            //Write to file
             bufferedWriter.write(trans);
 
+            //Make new space for the next deposit(go to the next line)
+            bufferedWriter.newLine();
+            //close bufferedWriter
             bufferedWriter.close();
 
 
