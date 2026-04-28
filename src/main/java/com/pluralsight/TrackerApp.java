@@ -147,7 +147,7 @@ public class TrackerApp {
             String payment = scanner.nextLine();
             Double payAmount = Double.parseDouble(payment);
 
-            //in case user types in positive, it makes sure its still saved as a negative in the transactions
+            //in case user types in positive, this makes sure it is still saved as a negative number in the transactions
             payAmount = -Math.abs(payAmount);
 
             //Create the formatter with the pattern I want
@@ -271,10 +271,10 @@ Enter your choice:
                     displayLedger("A");
                     break;
                 case "D": //deposits
-                    //depositTransaction();
+                    displayLedger("D");
                     break;
                 case "P": //payements
-                    //makePayments
+                    //displayLedger();
                     break;
                 case "R":
                     showReportMenu();
@@ -301,7 +301,15 @@ Enter your choice:
                     System.out.print(s.getVendor() + "|");
                     System.out.println(s.getAmount());
                 
-                } else if (choice.equalsIgnoreCase("D" && s.getAmount().starts)) {
+                } else if (choice.equalsIgnoreCase("D")) {
+                    if(s.getAmount() > 0){
+                        System.out.print(s.getDate() + "|");
+                        System.out.print(s.getTime() + "|");
+                        System.out.print(s.getDescription() + "|");
+                        System.out.print(s.getVendor() + "|");
+                        System.out.println(s.getAmount());
+                    }
+
                     
                 }
 
