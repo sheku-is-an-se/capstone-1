@@ -79,6 +79,17 @@ public class TrackerApp {
             fileWriter = new FileWriter(TRANSACTIONS_FILE_NAME, true);
             bufferedWriter = new BufferedWriter(fileWriter);
 
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+            System.out.println("What is the date of this transaction?(yyyy-MM-dd)");
+            String depDate = scanner.nextLine();
+            LocalDate depositDate = LocalDate.parse(depDate, dateFormatter);
+
+            System.out.println("What is the time of this transaction?(HH:mm:ss)");
+            String depTime = scanner.nextLine();
+            LocalTime depositTime = LocalTime.parse(depTime, timeFormatter);
+
             //prompt user for description
             System.out.println("What's the description of the payment?");
             String depDesc = scanner.nextLine();
@@ -93,23 +104,11 @@ public class TrackerApp {
             //in case the user types in a negative
             depAmount = Math.abs(depAmount);
 
-            //Create the formatter with the pattern I want
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            //Get the current Date
-            LocalDate today = LocalDate.now();
-            //Format it and store it into a string
-            String formattedDate = today.format(formatter);
 
-            //Get the current Time
-            LocalTime now = LocalTime.now();
-            //Create pattern
-            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-            //Format it and store it into a string
-            String formattedTime = now.format(timeFormatter);
 
 
             // Create the format that is going to enter transactions.csv
-            String trans = formattedDate + "|" + formattedTime + "|" + depDesc + "|" + depVend + "|" + depAmount;
+            String trans = depositDate + "|" + depositTime + "|" + depDesc + "|" + depVend + "|" + depAmount;
 
 
             //Write to file
@@ -136,6 +135,21 @@ public class TrackerApp {
             fileWriter = new FileWriter(TRANSACTIONS_FILE_NAME, true);
             bufferedWriter = new BufferedWriter(fileWriter);
 
+
+            //Create pattern
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+            //Prompt use for date
+            System.out.println("What is the date of this transaction?(yyyy-MM-dd)");
+            String depDate = scanner.nextLine();
+            LocalDate depositDate = LocalDate.parse(depDate, dateFormatter);
+
+            //Prompt user for time
+            System.out.println("What is the time of this transaction?(HH:mm:ss)");
+            String depTime = scanner.nextLine();
+            LocalTime depositTime = LocalTime.parse(depTime, timeFormatter);
+
             //prompt user for description
             System.out.println("What's the description of the payment?");
             String payDesc = scanner.nextLine();
@@ -147,33 +161,21 @@ public class TrackerApp {
             String payment = scanner.nextLine();
             Double payAmount = Double.parseDouble(payment);
 
-            //in case user types in positive, this makes sure it is still saved as a negative number in the transactions
+            //in case the user types in a negative
             payAmount = -Math.abs(payAmount);
 
-            //Create the formatter with the pattern I want
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            //Get the current Date
-            LocalDate today = LocalDate.now();
-            //Format it and store it into a string
-            String formattedDate = today.format(formatter);
 
-            //Get the current Time
-            LocalTime now = LocalTime.now();
-            //Create pattern
-            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-            //Format it and store it into a string
-            String formattedTime = now.format(timeFormatter);
 
 
             // Create the format that is going to enter transactions.csv
-            String trans = formattedDate + "|" + formattedTime + "|" + payDesc + "|" + payVend + "|" + payAmount;
-
+            String trans = depositDate + "|" + depositTime + "|" + payDesc + "|" + payVend + "|" + payAmount;
 
             //Write to file
             bufferedWriter.write(trans);
 
-            //Make new space for the next deposit(go to the next line)
+            //Go to the next line
             bufferedWriter.newLine();
+
             //close bufferedWriter
             bufferedWriter.close();
 
@@ -182,7 +184,6 @@ public class TrackerApp {
             throw new RuntimeException(e);
         }
     }
-
 
 
     private static ArrayList<Transaction> loadTransactions(String fileName) {
@@ -205,11 +206,9 @@ public class TrackerApp {
                 line = bufferedReader.readLine();
             }
             bufferedReader.close();
-        }
-        catch (FileNotFoundException fne) {
+        } catch (FileNotFoundException fne) {
             System.err.println("File not found: " + fileName);
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             System.out.println("Error loading inventory file: " + ex);
         }
 
@@ -220,51 +219,46 @@ public class TrackerApp {
         String[] parts = line.split("\\|");
 
         //todo make an exception for whitespace
-        if(parts.length != 5){
+        if (parts.length != 5) {
             throw new RuntimeException("Unexpected number of fields");
 
         }
 
-        String date = parts[0];
-        String time = parts[1];
+        LocalDate date = LocalDate.parse(parts[0]);
+        LocalTime time = LocalTime.parse(parts[1]);
         String description = parts[2];
         String vendor = parts[3];
-        String amt = parts[4];
-        Double amount = Double.parseDouble(amt);
+        double amount = Double.parseDouble(parts[4]);
 
-        return new Transaction(date, time, description, vendor,amount);
+        return new Transaction(date, time, description, vendor, amount);
     }
-
-
-
-
 
 
     private static void ledgerMenu() {
         String prompt = """
-╔══════════════════════════════════════════════╗
-║               LEDGER CENTER                 ║
-╠══════════════════════════════════════════════╣
-║      Review transactions and reports        ║
-╚══════════════════════════════════════════════╝
-
-                LEDGER MENU
-------------------------------------------------
-[A] View All Transactions
-[D] View Deposits
-[P] View Payments
-[R] Open Reports
-[H] Return Home
-------------------------------------------------
-Enter your choice:
-""";
+                ╔══════════════════════════════════════════════╗
+                ║               LEDGER CENTER                 ║
+                ╠══════════════════════════════════════════════╣
+                ║      Review transactions and reports        ║
+                ╚══════════════════════════════════════════════╝
+                
+                                LEDGER MENU
+                ------------------------------------------------
+                [A] View All Transactions
+                [D] View Deposits
+                [P] View Payments
+                [R] Open Reports
+                [H] Return Home
+                ------------------------------------------------
+                Enter your choice:
+                """;
 
         boolean running = true;
 
 
         do {
             System.out.println(prompt);
-            String userMenu = scanner.nextLine();
+            String userMenu = scanner.nextLine().toUpperCase();
 
             switch (userMenu) {
                 case "A":
@@ -273,8 +267,8 @@ Enter your choice:
                 case "D": //deposits
                     displayLedger("D");
                     break;
-                case "P": //payements
-                    //displayLedger();
+                case "P": //payments
+                    displayLedger("P");
                     break;
                 case "R":
                     showReportMenu();
@@ -291,90 +285,136 @@ Enter your choice:
     }
 
 
-        private static void displayLedger (String choice){
-            ArrayList<Transaction> inventory = loadTransactions(TRANSACTIONS_FILE_NAME);
-            for (Transaction s : inventory){
-                if(choice.equalsIgnoreCase("A")) {
+    private static void displayLedger(String choice) {
+        ArrayList<Transaction> inventory = loadTransactions(TRANSACTIONS_FILE_NAME);
+
+        for (Transaction s : inventory) {
+            switch (choice.toUpperCase()) {
+                case "A":
                     System.out.print(s.getDate() + "|");
                     System.out.print(s.getTime() + "|");
                     System.out.print(s.getDescription() + "|");
                     System.out.print(s.getVendor() + "|");
                     System.out.println(s.getAmount());
-                
-                } else if (choice.equalsIgnoreCase("D")) {
-                    if(s.getAmount() > 0){
+                    break;
+
+                case "D":
+                    if (s.getAmount() > 0) {
                         System.out.print(s.getDate() + "|");
                         System.out.print(s.getTime() + "|");
                         System.out.print(s.getDescription() + "|");
                         System.out.print(s.getVendor() + "|");
                         System.out.println(s.getAmount());
                     }
+                    break;
 
-                    
-                }
+                case "P":
+                    if (s.getAmount() < 0) {
+                        System.out.print(s.getDate() + "|");
+                        System.out.print(s.getTime() + "|");
+                        System.out.print(s.getDescription() + "|");
+                        System.out.print(s.getVendor() + "|");
+                        System.out.println(s.getAmount());
+                    }
+                    break;
+
 
             }
-
         }
+    }
 
 
+private static void showReportMenu() {
+    String prompt = """
+            ╔══════════════════════════════════════════════╗
+            ║              LEDGERPRO FINANCE HUB          ║
+            ╠══════════════════════════════════════════════╣
+            ║          Reporting and search tools         ║
+            ╚══════════════════════════════════════════════╝
+            
+                            REPORTS MENU
+            ------------------------------------------------
+            [1] Month To Date
+            [2] Previous Month
+            [3] Year To Date
+            [4] Previous Year
+            [5] Search By Vendor
+            [0] Return to Ledger
+            ------------------------------------------------
+            Enter your choice:
+            """;
+
+    boolean running = true;
 
 
+    do {
+        System.out.println(prompt);
+        String userMenu = scanner.nextLine();
 
-    private static void showReportMenu() {
-        String prompt = """
-╔══════════════════════════════════════════════╗
-║              LEDGERPRO FINANCE HUB          ║
-╠══════════════════════════════════════════════╣
-║          Reporting and search tools         ║
-╚══════════════════════════════════════════════╝
+        switch (userMenu) {
+            case "1":
+                //displayReport(1);
+                break;
+            case "2":
+                //displayReport(2)
+                break;
+            case "3":
+                //displayReport(3);
+                break;
+            case "4": //previous year
+                //displayReport(4);
+                break;
+            case "5":
+                //searchByVendor();
+                break;
+            case "0": //Go back to ledger menu
+                running = false;
+                break;
+            default:
+                System.err.println(("Oops! That wasn't a valid option."));
+                break;
+        }
+    } while (running);
 
-                REPORTS MENU
-------------------------------------------------
-[1] Month To Date
-[2] Previous Month
-[3] Year To Date
-[4] Previous Year
-[5] Search By Vendor
-[0] Return to Ledger
-------------------------------------------------
-Enter your choice:
-""";
 
-        boolean running = true;
+}
 
+    private static void displayReport(int choice) {
+        ArrayList<Transaction> inventory = loadTransactions(TRANSACTIONS_FILE_NAME);
 
-        do {
-            System.out.println(prompt);
-            String userMenu = scanner.nextLine();
-
-            switch (userMenu) {
-                case "1":
-                    //MonthtoMonth
-                    //monthToMonth();
+        for (Transaction s : inventory) {
+            switch (choice) {
+                case 1:
+                    System.out.print(s.getDate() + "|");
+                    System.out.print(s.getTime() + "|");
+                    System.out.print(s.getDescription() + "|");
+                    System.out.print(s.getVendor() + "|");
+                    System.out.println(s.getAmount());
                     break;
-                case "2":
-                    //previousMonth();
+
+                case 2:
+                    if (s.getAmount() > 0) {
+                        System.out.print(s.getDate() + "|");
+                        System.out.print(s.getTime() + "|");
+                        System.out.print(s.getDescription() + "|");
+                        System.out.print(s.getVendor() + "|");
+                        System.out.println(s.getAmount());
+                    }
                     break;
-                case "3":
-                    //yearToYear();
+
+                case 3:
+                    if (s.getAmount() < 0) {
+                        System.out.print(s.getDate() + "|");
+                        System.out.print(s.getTime() + "|");
+                        System.out.print(s.getDescription() + "|");
+                        System.out.print(s.getVendor() + "|");
+                        System.out.println(s.getAmount());
+                    }
                     break;
-                case "4": //previous year
-                    //previousYear();
-                    break;
-                case "5":
-                    //searchByVendor();
-                    break;
-                case "0": //Go back to ledger menu
-                    running = false;
-                    break;
-                default:
-                    System.err.println(("Oops! That wasn't a valid option."));
-                    break;
+
+
             }
-        } while (running);
-
-
+        }
     }
 
 
