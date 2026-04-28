@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-
+//todo i was thinking of having the transactions stay there until the user presses any key/enter and then it would go back to menu. to be honest, how does that sound?
 public class TrackerApp {
     public static Scanner scanner = new Scanner(System.in);
     public static final String TRANSACTIONS_FILE_NAME = "src/main/resources/transactions.csv";
@@ -16,8 +16,12 @@ public class TrackerApp {
     public static void main(String[] args) {
         mainMenu();
         System.out.println("Thank you, come back soon!");
+    }
 
-
+    private static void printTransaction(Transaction t) {
+        String formatted = String.format("%s|%s|%s|%s|%.2f",
+                t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getAmount());
+        System.out.println(formatted);
     }
 
 
@@ -83,12 +87,12 @@ public class TrackerApp {
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
             System.out.println("What is the date of this transaction?(yyyy-MM-dd)");
-            String depDate = scanner.nextLine();
-            LocalDate depositDate = LocalDate.parse(depDate, dateFormatter);
+            String userInputString = scanner.nextLine();
+            LocalDate depositDate = LocalDate.parse(userInputString, dateFormatter);
 
             System.out.println("What is the time of this transaction?(HH:mm:ss)");
-            String depTime = scanner.nextLine();
-            LocalTime depositTime = LocalTime.parse(depTime, timeFormatter);
+            userInputString = scanner.nextLine();
+            LocalTime depositTime = LocalTime.parse(userInputString, timeFormatter);
 
             //prompt user for description
             System.out.println("What's the description of the payment?");
@@ -104,12 +108,8 @@ public class TrackerApp {
             //in case the user types in a negative
             depAmount = Math.abs(depAmount);
 
-
-
-
             // Create the format that is going to enter transactions.csv
             String trans = depositDate + "|" + depositTime + "|" + depDesc + "|" + depVend + "|" + depAmount;
-
 
             //Write to file
             bufferedWriter.write(trans);
@@ -165,8 +165,6 @@ public class TrackerApp {
             payAmount = -Math.abs(payAmount);
 
 
-
-
             // Create the format that is going to enter transactions.csv
             String trans = depositDate + "|" + depositTime + "|" + payDesc + "|" + payVend + "|" + payAmount;
 
@@ -210,6 +208,7 @@ public class TrackerApp {
             System.err.println("File not found: " + fileName);
         } catch (IOException ex) {
             System.out.println("Error loading inventory file: " + ex);
+            throw new RuntimeException(ex);
         }
 
         return transactions;
@@ -291,30 +290,18 @@ public class TrackerApp {
         for (Transaction s : inventory) {
             switch (choice.toUpperCase()) {
                 case "A":
-                    System.out.print(s.getDate() + "|");
-                    System.out.print(s.getTime() + "|");
-                    System.out.print(s.getDescription() + "|");
-                    System.out.print(s.getVendor() + "|");
-                    System.out.println(s.getAmount());
+                    printTransaction(s);
                     break;
 
                 case "D":
                     if (s.getAmount() > 0) {
-                        System.out.print(s.getDate() + "|");
-                        System.out.print(s.getTime() + "|");
-                        System.out.print(s.getDescription() + "|");
-                        System.out.print(s.getVendor() + "|");
-                        System.out.println(s.getAmount());
+                        printTransaction(s);
                     }
                     break;
 
                 case "P":
                     if (s.getAmount() < 0) {
-                        System.out.print(s.getDate() + "|");
-                        System.out.print(s.getTime() + "|");
-                        System.out.print(s.getDescription() + "|");
-                        System.out.print(s.getVendor() + "|");
-                        System.out.println(s.getAmount());
+                        printTransaction(s);
                     }
                     break;
 
@@ -324,100 +311,102 @@ public class TrackerApp {
     }
 
 
-private static void showReportMenu() {
-    String prompt = """
-            ╔══════════════════════════════════════════════╗
-            ║              LEDGERPRO FINANCE HUB          ║
-            ╠══════════════════════════════════════════════╣
-            ║          Reporting and search tools         ║
-            ╚══════════════════════════════════════════════╝
-            
-                            REPORTS MENU
-            ------------------------------------------------
-            [1] Month To Date
-            [2] Previous Month
-            [3] Year To Date
-            [4] Previous Year
-            [5] Search By Vendor
-            [0] Return to Ledger
-            ------------------------------------------------
-            Enter your choice:
-            """;
+    private static void showReportMenu() {
+        String prompt = """
+                ╔══════════════════════════════════════════════╗
+                ║              LEDGERPRO FINANCE HUB          ║
+                ╠══════════════════════════════════════════════╣
+                ║          Reporting and search tools         ║
+                ╚══════════════════════════════════════════════╝
+                
+                                REPORTS MENU
+                ------------------------------------------------
+                [1] Month To Date
+                [2] Previous Month
+                [3] Year To Date
+                [4] Previous Year
+                [5] Search By Vendor
+                [0] Return to Ledger
+                ------------------------------------------------
+                Enter your choice:
+                """;
 
-    boolean running = true;
+        boolean running = true;
 
 
-    do {
-        System.out.println(prompt);
-        String userMenu = scanner.nextLine();
+        do {
+            System.out.println(prompt);
+            String userMenu = scanner.nextLine();
 
-        switch (userMenu) {
-            case "1":
-                //displayReport(1);
-                break;
-            case "2":
-                //displayReport(2)
-                break;
-            case "3":
-                //displayReport(3);
-                break;
-            case "4": //previous year
-                //displayReport(4);
-                break;
-            case "5":
-                //searchByVendor();
-                break;
-            case "0": //Go back to ledger menu
-                running = false;
-                break;
-            default:
-                System.err.println(("Oops! That wasn't a valid option."));
-                break;
+            switch (userMenu) {
+                case "1":
+                    //displayReport(1);
+                    break;
+                case "2":
+                    //displayReport(2)
+                    break;
+                case "3":
+                    //displayReport(3);
+                    break;
+                case "4": //previous year
+                    displayPreviousYear();
+                    break;
+                case "5":
+                    //searchByVendor();
+                    break;
+                case "0": //Go back to ledger menu
+                    running = false;
+                    break;
+                default:
+                    System.err.println(("Oops! That wasn't a valid option."));
+                    break;
+            }
+        } while (running);
+
+
+    }
+
+    private static void displayPreviousYear() {
+
+        LocalDate today = LocalDate.now();
+        int lastYear = today.getYear() - 1;
+        ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
+        for (Transaction t : transactions) {
+            int transactionYear = t.getDate().getYear();
+            if (transactionYear == lastYear) {
+                printTransaction(t);
+            }
+
         }
-    } while (running);
-
-
-}
+    }
 
     private static void displayReport(int choice) {
-        ArrayList<Transaction> inventory = loadTransactions(TRANSACTIONS_FILE_NAME);
+        ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
 
-        for (Transaction s : inventory) {
+        for (Transaction s : transactions) {
             switch (choice) {
                 case 1:
-                    System.out.print(s.getDate() + "|");
-                    System.out.print(s.getTime() + "|");
-                    System.out.print(s.getDescription() + "|");
-                    System.out.print(s.getVendor() + "|");
-                    System.out.println(s.getAmount());
+                    printTransaction(s);
                     break;
 
                 case 2:
                     if (s.getAmount() > 0) {
-                        System.out.print(s.getDate() + "|");
-                        System.out.print(s.getTime() + "|");
-                        System.out.print(s.getDescription() + "|");
-                        System.out.print(s.getVendor() + "|");
-                        System.out.println(s.getAmount());
+                        printTransaction(s);
                     }
                     break;
 
                 case 3:
                     if (s.getAmount() < 0) {
-                        System.out.print(s.getDate() + "|");
-                        System.out.print(s.getTime() + "|");
-                        System.out.print(s.getDescription() + "|");
-                        System.out.print(s.getVendor() + "|");
-                        System.out.println(s.getAmount());
+                        printTransaction(s);
                     }
                     break;
+                default:
+                    throw new RuntimeException("This should never happen!");
 
 
             }
         }
     }
-
-
 
 
 }
