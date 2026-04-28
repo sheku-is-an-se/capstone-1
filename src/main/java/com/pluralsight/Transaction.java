@@ -1,13 +1,13 @@
 package com.pluralsight;
 
-public class Transactions {
+public class Transaction {
     private String date;
     private String time;
     private String description;
     private String vendor;
     private double amount;
 
-    public Transactions(String date, String time, String description, String vendor, double amount) {
+    public Transaction(String date, String time, String description, String vendor, double amount) {
         this.date = date;
         this.time = time;
         this.description = description;
@@ -16,22 +16,22 @@ public class Transactions {
     }
 
     public String getDate() {
-        return date;
+        return this.date;
     }
 
     public String getTime() {
-        return time;
+        return this.time;
     }
 
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     public String getVendor() {
-        return vendor;
+        return this.vendor;
     }
 
     public double getAmount() {
-        return amount;
+        return this.amount;
     }
 }

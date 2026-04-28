@@ -11,9 +11,7 @@ import java.util.Scanner;
 
 public class TrackerApp {
     public static Scanner scanner = new Scanner(System.in);
-    public static ArrayList<Transactions> transactions = new ArrayList<>();
-    public static final String TRANSACTIONS_FILE_NAME = "src/main/resources/products.csv";
-
+    public static final String TRANSACTIONS_FILE_NAME = "src/main/resources/transactions.csv";
 
     public static void main(String[] args) {
         mainMenu();
@@ -46,7 +44,8 @@ public class TrackerApp {
 
         do {
             System.out.println(prompt);
-            String userMenu = scanner.nextLine();
+            String userMenu = scanner.nextLine().toUpperCase();
+
 
             switch (userMenu) {
                 case "D":
@@ -91,6 +90,9 @@ public class TrackerApp {
             String payment = scanner.nextLine();
             Double depAmount = Double.parseDouble(payment);
 
+            //in case the user types in a negative
+            depAmount = Math.abs(depAmount);
+
             //Create the formatter with the pattern I want
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             //Get the current Date
@@ -106,7 +108,7 @@ public class TrackerApp {
             String formattedTime = now.format(timeFormatter);
 
 
-            // Create the format that is going to enter products.csv
+            // Create the format that is going to enter transactions.csv
             String trans = formattedDate + "|" + formattedTime + "|" + depDesc + "|" + depVend + "|" + depAmount;
 
 
@@ -131,7 +133,7 @@ public class TrackerApp {
 
 
         try {
-            fileWriter = new FileWriter(TRANSACTIONS_FILE_NAME,true);
+            fileWriter = new FileWriter(TRANSACTIONS_FILE_NAME, true);
             bufferedWriter = new BufferedWriter(fileWriter);
 
             //prompt user for description
@@ -144,6 +146,9 @@ public class TrackerApp {
             System.out.println("What's the amount?");
             String payment = scanner.nextLine();
             Double payAmount = Double.parseDouble(payment);
+
+            //in case user types in positive, it makes sure its still saved as a negative in the transactions
+            payAmount = -Math.abs(payAmount);
 
             //Create the formatter with the pattern I want
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -160,9 +165,8 @@ public class TrackerApp {
             String formattedTime = now.format(timeFormatter);
 
 
-
-            // Create the format that is going to enter products.csv
-            String trans  =  formattedDate + "|" + formattedTime +  "|" + payDesc + "|" + payVend + "|" + "-" + payAmount;
+            // Create the format that is going to enter transactions.csv
+            String trans = formattedDate + "|" + formattedTime + "|" + payDesc + "|" + payVend + "|" + payAmount;
 
 
             //Write to file
@@ -174,28 +178,65 @@ public class TrackerApp {
             bufferedWriter.close();
 
 
-
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
 
-    /*
-        private static Transactions parseProduct (String line){
-            String[] parts = line.split("\\|");
 
-            String date = parts[0];
-            String time = parts[1];
-            String description = parts[2];
-            String vendor = parts[3];
-            double amount = Double.parseDouble(parts[4]);
+    private static ArrayList<Transaction> loadTransactions(String fileName) {
+        ArrayList<Transaction> transactions = new ArrayList<Transaction>();
+        FileReader fileReader = null;
+        BufferedReader bufferedReader = null;
 
-            return new Transactions(date, time, description, vendor, amount);
+        try {
+            fileReader = new FileReader(fileName);
+            bufferedReader = new BufferedReader(fileReader);
+
+            String line = bufferedReader.readLine();
+
+            // skip the header row
+            line = bufferedReader.readLine();
+
+            while (line != null) {
+                Transaction transaction = parseTransactions(line);
+                transactions.add(transaction);
+                line = bufferedReader.readLine();
+            }
+            bufferedReader.close();
+        }
+        catch (FileNotFoundException fne) {
+            System.err.println("File not found: " + fileName);
+        }
+        catch (IOException ex) {
+            System.out.println("Error loading inventory file: " + ex);
         }
 
-     */
+        return transactions;
+    }
+
+    private static Transaction parseTransactions(String line) {
+        String[] parts = line.split("\\|");
+
+        //todo make an exception for whitespace
+        if(parts.length != 5){
+            throw new RuntimeException("Unexpected number of fields");
+
+        }
+
+        String date = parts[0];
+        String time = parts[1];
+        String description = parts[2];
+        String vendor = parts[3];
+        String amt = parts[4];
+        Double amount = Double.parseDouble(amt);
+
+        return new Transaction(date, time, description, vendor,amount);
+    }
+
+
+
 
 
 
@@ -227,7 +268,7 @@ Enter your choice:
 
             switch (userMenu) {
                 case "A":
-                    //displayAll
+                    displayLedger("A");
                     break;
                 case "D": //deposits
                     //depositTransaction();
@@ -248,6 +289,29 @@ Enter your choice:
         } while (running);
 
     }
+
+
+        private static void displayLedger (String choice){
+            ArrayList<Transaction> inventory = loadTransactions(TRANSACTIONS_FILE_NAME);
+            for (Transaction s : inventory){
+                if(choice.equalsIgnoreCase("A")) {
+                    System.out.print(s.getDate() + "|");
+                    System.out.print(s.getTime() + "|");
+                    System.out.print(s.getDescription() + "|");
+                    System.out.print(s.getVendor() + "|");
+                    System.out.println(s.getAmount());
+                
+                } else if (choice.equalsIgnoreCase("D" && s.getAmount().starts)) {
+                    
+                }
+
+            }
+
+        }
+
+
+
+
 
     private static void showReportMenu() {
         String prompt = """
@@ -295,7 +359,7 @@ Enter your choice:
                     break;
                 case "0": //Go back to ledger menu
                     running = false;
-                    ;
+                    break;
                 default:
                     System.err.println(("Oops! That wasn't a valid option."));
                     break;
@@ -304,6 +368,8 @@ Enter your choice:
 
 
     }
+
+
 
 
 }
