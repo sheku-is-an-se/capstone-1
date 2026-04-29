@@ -4,6 +4,7 @@ package com.pluralsight;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -340,10 +341,10 @@ public class TrackerApp {
 
             switch (userMenu) {
                 case "1":
-                    //displayReport(1);
+                    monthToDate();
                     break;
                 case "2":
-                    //displayReport(2)
+                    previousMonth();
                     break;
                 case "3":
                     yearToDate();
@@ -364,6 +365,20 @@ public class TrackerApp {
         } while (running);
 
 
+    }
+
+
+
+    private static void previousMonth() {
+        LocalDate today = LocalDate.now();
+        LocalDate lastMonth = today.minusMonths(1);
+        ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
+        for (Transaction t : transactions) {
+            int transactionMonth = t.getDate().getMonthValue();
+            if (transactionMonth == lastMonth.getMonthValue() && t.getDate().getYear() == lastMonth.getYear()) {
+                printTransaction(t);
+            }
+        }
     }
 
     private static void yearToDate() {
