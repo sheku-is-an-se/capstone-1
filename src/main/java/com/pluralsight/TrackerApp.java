@@ -1,11 +1,9 @@
 
 package com.pluralsight;
 
-import java.awt.dnd.DragSource;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -365,7 +363,7 @@ public class TrackerApp {
                     searchByVendor();
                     break;
                 case "6":
-                    //customSearch();
+                    customFilters();
                     break;
                 case "0": //Go back to ledger menu
                     running = false;
@@ -491,9 +489,8 @@ public class TrackerApp {
 
         for(Transaction transaction : transactions1){
             printTransaction(transaction);
-            pause();
         }
-
+        pause();
         return transactions1;
 
     }
@@ -512,9 +509,10 @@ public class TrackerApp {
 
     private static ArrayList<Transaction> filterByAmount(ArrayList<Transaction> result,String prompt) {
         ArrayList<Transaction> transactions1 = new ArrayList<>();
+        Double vendPrompt = Double.parseDouble(prompt);
 
         for (Transaction transaction : result) {
-            Double vendPrompt = Double.parseDouble(prompt);
+
             if (Double.compare(vendPrompt, transaction.getAmount()) == 0) {
                 transactions1.add(transaction);
             }
@@ -536,12 +534,11 @@ public class TrackerApp {
 
     private static ArrayList<Transaction> filterByEndDate(ArrayList<Transaction> result,String prompt) {
         ArrayList<Transaction> transactions1 = new ArrayList<>();
-        LocalDate today = LocalDate.now();
+        LocalDate endDatePrompt = LocalDate.parse(prompt);
 
 
         for (Transaction transaction : result) {
-            LocalDate endDatePrompt = LocalDate.parse(prompt);
-            if (!endDatePrompt.isAfter(transaction.getDate())) {
+            if (!endDatePrompt.isBefore(transaction.getDate())) {
                 transactions1.add(transaction);
             }
 
@@ -552,6 +549,14 @@ public class TrackerApp {
     private static ArrayList<Transaction> filterByStartDate(ArrayList<Transaction> result,String prompt) {
         ArrayList<Transaction> transactions1 = new ArrayList<>();
         LocalDate startDatePrompt = LocalDate.parse(prompt);
+
+
+        for (Transaction transaction : result) {
+            if (!startDatePrompt.isAfter(transaction.getDate())) {
+                transactions1.add(transaction);
+            }
+
+        }
         return transactions1;
     }
 
