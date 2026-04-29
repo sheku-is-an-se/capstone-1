@@ -19,9 +19,9 @@ public class TrackerApp {
         System.out.println("Thank you, come back soon!");
     }
 
-    private static void printTransaction(Transaction t) {
+    private static void printTransaction(Transaction transaction) {
         String formatted = String.format("%s|%s|%s|%s|%.2f",
-                t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getAmount());
+                transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
         System.out.println(formatted);
     }
 
@@ -35,12 +35,12 @@ public class TrackerApp {
         }
     }
 
-    private static String promptForString(String input) {
+    private static String promptForString(String prompt) {
         String result = "";
 
-        //// Keep looping as long as the result is just whitespace or empty
+        //// Keep looping until the user enters text
         while (result.trim().isEmpty()) {
-            System.out.print(input);
+            System.out.print(prompt);
             result = scanner.nextLine();
 
 
@@ -67,8 +67,8 @@ public class TrackerApp {
         while (true) {
             try {
                 System.out.println(message);
-                String payment = scanner.nextLine();
-                Double result = Double.parseDouble(payment);
+                String amountInput = scanner.nextLine();
+                Double result = Double.parseDouble(amountInput);
                 return result;
             } catch (NumberFormatException e) {
                 System.err.println("Invalid selection, please type a number.");
@@ -76,10 +76,10 @@ public class TrackerApp {
         }
     }
 
-    private static LocalTime promptForTime(String selction) {
+    private static LocalTime promptForTime(String prompt) {
         while (true) {
             try {
-                System.out.print(selction);
+                System.out.print(prompt);
                 String input = scanner.nextLine();
                 return LocalTime.parse(input, DateTimeFormatter.ofPattern("HH:mm:ss"));
             } catch (DateTimeParseException e) {
@@ -191,7 +191,7 @@ public class TrackerApp {
             line = bufferedReader.readLine();
 
             while (line != null) {
-                Transaction transaction = parseTransactions(line);
+                Transaction transaction = parseTransaction(line);
                 transactions.add(transaction);
                 line = bufferedReader.readLine();
             }
@@ -199,14 +199,14 @@ public class TrackerApp {
         } catch (FileNotFoundException fne) {
             System.err.println("File not found: " + fileName);
         } catch (IOException ex) {
-            System.out.println("Error loading inventory file: " + ex);
+            System.out.println("Error loading transactions file: " + ex);
             throw new RuntimeException(ex);
         }
 
         return transactions;
     }
 
-    private static Transaction parseTransactions(String line) {
+    private static Transaction parseTransaction(String line) {
         String[] parts = line.split("\\|");
 
         if (parts.length != 5) {
@@ -256,10 +256,10 @@ public class TrackerApp {
                 case "A":
                     displayLedger("A");
                     break;
-                case "D": //deposits
+                case "D":
                     displayLedger("D");
                     break;
-                case "P": //payments
+                case "P":
                     displayLedger("P");
                     break;
                 case "R":
@@ -278,24 +278,24 @@ public class TrackerApp {
 
 
     private static void displayLedger(String choice) {
-        ArrayList<Transaction> inventory = loadTransactions(TRANSACTIONS_FILE_NAME);
+        ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
 
-        for (int i = inventory.size() - 1; i >= 0; i--) {
-            Transaction s = inventory.get(i);
+        for (int i = transactions.size() - 1; i >= 0; i--) {
+            Transaction transaction = transactions.get(i);
             switch (choice.toUpperCase()) {
                 case "A":
-                    printTransaction(s);
+                    printTransaction(transaction);
                     break;
 
                 case "D":
-                    if (s.getAmount() > 0) {
-                        printTransaction(s);
+                    if (transaction.getAmount() > 0) {
+                        printTransaction(transaction);
                     }
                     break;
 
                 case "P":
-                    if (s.getAmount() < 0) {
-                        printTransaction(s);
+                    if (transaction.getAmount() < 0) {
+                        printTransaction(transaction);
                     }
                     break;
 
@@ -373,12 +373,12 @@ public class TrackerApp {
 
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
         for (int i = transactions.size() - 1; i >= 0; i--) {
-            Transaction s = transactions.get(i);
-            int transactionMonth = s.getDate().getMonthValue();
-            int transactionYear = s.getDate().getYear();
+            Transaction transaction = transactions.get(i);
+            int transactionMonth = transaction.getDate().getMonthValue();
+            int transactionYear = transaction.getDate().getYear();
 
-            if (transactionMonth == currentMonth && transactionYear == currentYear && !s.getDate().isAfter(today)) {
-                printTransaction(s);
+            if (transactionMonth == currentMonth && transactionYear == currentYear && !transaction.getDate().isAfter(today)) {
+                printTransaction(transaction);
             }
         }
         pause();
@@ -389,10 +389,10 @@ public class TrackerApp {
         LocalDate lastMonth = today.minusMonths(1);
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
         for (int i = transactions.size() - 1; i >= 0; i--) {
-            Transaction t = transactions.get(i);
-            int transactionMonth = t.getDate().getMonthValue();
-            if (transactionMonth == lastMonth.getMonthValue() && t.getDate().getYear() == lastMonth.getYear()) {
-                printTransaction(t);
+            Transaction transaction = transactions.get(i);
+            int transactionMonth = transaction.getDate().getMonthValue();
+            if (transactionMonth == lastMonth.getMonthValue() && transaction.getDate().getYear() == lastMonth.getYear()) {
+                printTransaction(transaction);
             }
         }
         pause();
@@ -403,10 +403,10 @@ public class TrackerApp {
         int currentYear = today.getYear();
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
         for (int i = transactions.size() - 1; i >= 0; i--) {
-            Transaction t = transactions.get(i);
-            int transactionYear = t.getDate().getYear();
-            if (transactionYear == currentYear && !t.getDate().isAfter(today)) {
-                printTransaction(t);
+            Transaction transaction = transactions.get(i);
+            int transactionYear = transaction.getDate().getYear();
+            if (transactionYear == currentYear && !transaction.getDate().isAfter(today)) {
+                printTransaction(transaction);
             }
         }
         pause();
@@ -418,10 +418,10 @@ public class TrackerApp {
         int lastYear = today.getYear() - 1;
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
         for (int i = transactions.size() - 1; i >= 0; i--) {
-            Transaction t = transactions.get(i);
-            int transactionYear = t.getDate().getYear();
+            Transaction transaction = transactions.get(i);
+            int transactionYear = transaction.getDate().getYear();
             if (transactionYear == lastYear) {
-                printTransaction(t);
+                printTransaction(transaction);
             }
 
         }
@@ -431,21 +431,21 @@ public class TrackerApp {
 
     private static void searchByVendor() {
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
-        boolean keepRunning = true; // This controls our outer loop 🔄
+        boolean keepRunning = true;
 
         do {
             boolean found = false; // Reset search status for each new name
-            String userInputString = promptForString("Enter vendor name (or 'exit' to go back): ");
+            String vendorName = promptForString("Enter vendor name (or 'exit' to go back): ");
 
-            if (userInputString.equalsIgnoreCase("exit")) {
-                return; // Exit the method immediately without pausing 🚪
+            if (vendorName.equalsIgnoreCase("exit")) {
+                return;
             }
 
             // 1. Searches and reverses the list
             for (int i = transactions.size() - 1; i >= 0; i--) {
-                Transaction t = transactions.get(i);
-                if (userInputString.equalsIgnoreCase(t.getVendor())) {
-                    printTransaction(t);
+                Transaction transaction = transactions.get(i);
+                if (vendorName.equalsIgnoreCase(transaction.getVendor())) {
+                    printTransaction(transaction);
                     found = true;
                 }
             }
