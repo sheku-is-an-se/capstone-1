@@ -367,7 +367,21 @@ public class TrackerApp {
 
     }
 
+    private static void monthToDate() {
+        LocalDate today = LocalDate.now();
+        int currentYear = today.getYear();
+        int currentMonth = today.getMonthValue();
 
+        ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
+        for (Transaction t : transactions) {
+            int transactionMonth = t.getDate().getMonthValue();
+            int transactionYear = t.getDate().getYear();
+
+            if (transactionMonth == currentMonth && transactionYear == currentYear && !t.getDate().isAfter(today)) {
+                printTransaction(t);
+            }
+        }
+    }
 
     private static void previousMonth() {
         LocalDate today = LocalDate.now();
