@@ -40,7 +40,7 @@ public class TrackerApp {
 
         //// Keep looping as long as the result is just whitespace or empty
         while (result.trim().isEmpty()) {
-            System.out.println(input);
+            System.out.print(input);
             result = scanner.nextLine();
 
 
@@ -59,17 +59,18 @@ public class TrackerApp {
             }
         }
     }
+
     private static Double promptForAmount(String message) {
 
         //// Keep looping as long as the result is just whitespace or empty
 
-        while(true){
-            try{
+        while (true) {
+            try {
                 System.out.println(message);
                 String payment = scanner.nextLine();
-                Double result = Math.abs(Double.parseDouble(payment));
+                Double result = Double.parseDouble(payment);
                 return result;
-            } catch (NumberFormatException e){
+            } catch (NumberFormatException e) {
                 System.err.println("Invalid selection, please type a number.");
             }
         }
@@ -86,7 +87,6 @@ public class TrackerApp {
             }
         }
     }
-
 
 
     private static void mainMenu() {
@@ -138,102 +138,41 @@ public class TrackerApp {
 
     }
 
-    private static void addDeposit() {
-        FileWriter fileWriter;
-        BufferedWriter bufferedWriter;
-
-
+    private static void saveTransaction(boolean isDeposit) {
         try {
-            fileWriter = new FileWriter(TRANSACTIONS_FILE_NAME, true);
-            bufferedWriter = new BufferedWriter(fileWriter);
+            FileWriter fileWriter = new FileWriter(TRANSACTIONS_FILE_NAME, true);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
-            //prompt user for date
-            LocalDate depositDate = promptForDate("Enter the date (yyyy-MM-dd): ");
-            //prompt user for time
-            LocalTime depositTime = promptForTime("Enter the time (HH:mm:ss): ");
+            LocalDate date = promptForDate("Enter the date (yyyy-MM-dd): ");
+            LocalTime time = promptForTime("Enter the time (HH:mm:ss): ");
+            String description = promptForString("Enter the description: ");
+            String vendor = promptForString("Enter the vendor: ");
+            double amount = promptForAmount("What's the amount? ");
 
-            //prompt user for description
-            String depDesc = promptForString("Enter the description: ");
-            //prompt user for vendor information
-            String depVend = promptForString("Enter the vendor: ");
+            if (isDeposit) {
+                amount = Math.abs(amount);
+            } else {
+                amount = -Math.abs(amount);
+            }
 
-            //prompt user for amount
-            double depAmount = promptForAmount("What's the amount? ");
+            String csvLine = date + "|" + time + "|" + description + "|" + vendor + "|" + amount;
 
-
-            // Create the format that is going to enter transactions.csv
-            String csvLine = depositDate + "|" + depositTime + "|" + depDesc + "|" + depVend + "|" + depAmount;
-
-            //Write to file
             bufferedWriter.write(csvLine);
-
-            //Make new space for the next deposit(go to the next line)
             bufferedWriter.newLine();
-            //close bufferedWriter
             bufferedWriter.close();
-
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    private static void addDeposit() {
+        saveTransaction(true);
+    }
+
 
     private static void makePayment() {
-        FileWriter fileWriter;
-        BufferedWriter bufferedWriter;
-
-
-        try {
-            fileWriter = new FileWriter(TRANSACTIONS_FILE_NAME, true);
-            bufferedWriter = new BufferedWriter(fileWriter);
-
-
-            //Create pattern
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-
-            //Prompt use for date
-            System.out.println("What is the date of this transaction?(yyyy-MM-dd)");
-            String depDate = scanner.nextLine();
-            LocalDate depositDate = LocalDate.parse(depDate, dateFormatter);
-
-            //Prompt user for time
-            System.out.println("What is the time of this transaction?(HH:mm:ss)");
-            String depTime = scanner.nextLine();
-            LocalTime depositTime = LocalTime.parse(depTime, timeFormatter);
-
-            //prompt user for description
-            System.out.println("What's the description of the payment?");
-            String payDesc = scanner.nextLine();
-            //prompt user for vendor information
-            System.out.println("Who's the vendor for this payment?");
-            String payVend = scanner.nextLine();
-            //prompt user for amount
-            System.out.println("What's the amount?");
-            String payment = scanner.nextLine();
-            Double payAmount = Double.parseDouble(payment);
-
-            //in case the user types in a negative
-            payAmount = -Math.abs(payAmount);
-
-
-            // Create the format that is going to enter transactions.csv
-            String trans = depositDate + "|" + depositTime + "|" + payDesc + "|" + payVend + "|" + payAmount;
-
-            //Write to file
-            bufferedWriter.write(trans);
-
-            //Go to the next line
-            bufferedWriter.newLine();
-
-            //close bufferedWriter
-            bufferedWriter.close();
-
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        saveTransaction(false);
     }
 
 
@@ -270,7 +209,6 @@ public class TrackerApp {
     private static Transaction parseTransactions(String line) {
         String[] parts = line.split("\\|");
 
-        //todo make an exception for whitespace
         if (parts.length != 5) {
             throw new RuntimeException("Unexpected number of fields");
 
@@ -311,7 +249,6 @@ public class TrackerApp {
         do {
             System.out.println(prompt);
             String userMenu = scanner.nextLine().toUpperCase();
-
 
 
             switch (userMenu) {
@@ -384,6 +321,7 @@ public class TrackerApp {
                 [3] Year To Date
                 [4] Previous Year
                 [5] Search By Vendor
+                [6] Custom Search
                 [0] Return to Ledger
                 ------------------------------------------------
                 Enter your choice:
@@ -492,27 +430,39 @@ public class TrackerApp {
 
 
     private static void searchByVendor() {
-        System.out.println("Which vendor would you like to search for?");
-        String userInputString = scanner.nextLine();
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
+        boolean keepRunning = true; // This controls our outer loop 🔄
 
-        boolean found = false;
+        do {
+            boolean found = false; // Reset search status for each new name
+            String userInputString = promptForString("Enter vendor name (or 'exit' to go back): ");
 
-
-        for (int i = transactions.size() - 1; i >= 0; i--) {
-            Transaction t = transactions.get(i);
-            String vendorName = t.getVendor();
-            if (userInputString.equalsIgnoreCase(vendorName)) {
-                printTransaction(t);
-                found = true;
+            if (userInputString.equalsIgnoreCase("exit")) {
+                return; // Exit the method immediately without pausing 🚪
             }
 
-        }
-        if (!found) {
-            System.err.println("The vendor does not exist please try again");
-        }
-        pause();
+            // 1. Searches and reverses the list
+            for (int i = transactions.size() - 1; i >= 0; i--) {
+                Transaction t = transactions.get(i);
+                if (userInputString.equalsIgnoreCase(t.getVendor())) {
+                    printTransaction(t);
+                    found = true;
+                }
+            }
 
+            // 2. Handle the results
+            if (found) {
+                pause(); // Allow user to read transactions first
+                String choice = promptForString("Do you want to search for more? (yes/no): ");
+                if (choice.equalsIgnoreCase("no")) {
+                    keepRunning = false; // Stop the loop
+                }
+            } else {
+                System.err.println("Vendor not found. Try again, or type 'exit' to return.");
+
+            }
+
+        } while (keepRunning);
     }
 
 
