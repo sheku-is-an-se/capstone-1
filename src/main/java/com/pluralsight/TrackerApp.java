@@ -5,6 +5,7 @@ import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -45,6 +46,45 @@ public class TrackerApp {
 
         }
         return result;
+    }
+
+    private static LocalDate promptForDate(String prompt) {
+        while (true) {
+            try {
+                System.out.print(prompt);
+                String input = scanner.nextLine();
+                return LocalDate.parse(input, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            } catch (DateTimeParseException e) {
+                System.err.println("Invalid date format. Please use yyyy-MM-dd.");
+            }
+        }
+    }
+    private static Double promptForAmount(String message) {
+
+        //// Keep looping as long as the result is just whitespace or empty
+
+        while(true){
+            try{
+                System.out.println(message);
+                String payment = scanner.nextLine();
+                Double result = Math.abs(Double.parseDouble(payment));
+                return result;
+            } catch (NumberFormatException e){
+                System.err.println("Invalid selection, please type a number.");
+            }
+        }
+    }
+
+    private static LocalTime promptForTime(String selction) {
+        while (true) {
+            try {
+                System.out.print(selction);
+                String input = scanner.nextLine();
+                return LocalTime.parse(input, DateTimeFormatter.ofPattern("HH:mm:ss"));
+            } catch (DateTimeParseException e) {
+                System.err.println("Invalid time format. Please use HH:mm:ss.");
+            }
+        }
     }
 
 
@@ -107,36 +147,25 @@ public class TrackerApp {
             fileWriter = new FileWriter(TRANSACTIONS_FILE_NAME, true);
             bufferedWriter = new BufferedWriter(fileWriter);
 
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-
-            System.out.println("What is the date of this transaction?(yyyy-MM-dd)");
-            String userInputString = scanner.nextLine();
-            LocalDate depositDate = LocalDate.parse(userInputString, dateFormatter);
-
-            System.out.println("What is the time of this transaction?(HH:mm:ss)");
-            userInputString = scanner.nextLine();
-            LocalTime depositTime = LocalTime.parse(userInputString, timeFormatter);
+            //prompt user for date
+            LocalDate depositDate = promptForDate("Enter the date (yyyy-MM-dd): ");
+            //prompt user for time
+            LocalTime depositTime = promptForTime("Enter the time (HH:mm:ss): ");
 
             //prompt user for description
-            System.out.println("What's the description of the payment?");
-            String depDesc = scanner.nextLine();
+            String depDesc = promptForString("Enter the description: ");
             //prompt user for vendor information
-            System.out.println("Who's the vendor for this payment?");
-            String depVend = scanner.nextLine();
-            //prompt user for amount
-            System.out.println("What's the amount?");
-            String payment = scanner.nextLine();
-            Double depAmount = Double.parseDouble(payment);
+            String depVend = promptForString("Enter the vendor: ");
 
-            //in case the user types in a negative
-            depAmount = Math.abs(depAmount);
+            //prompt user for amount
+            double depAmount = promptForAmount("What's the amount? ");
+
 
             // Create the format that is going to enter transactions.csv
-            String trans = depositDate + "|" + depositTime + "|" + depDesc + "|" + depVend + "|" + depAmount;
+            String csvLine = depositDate + "|" + depositTime + "|" + depDesc + "|" + depVend + "|" + depAmount;
 
             //Write to file
-            bufferedWriter.write(trans);
+            bufferedWriter.write(csvLine);
 
             //Make new space for the next deposit(go to the next line)
             bufferedWriter.newLine();
