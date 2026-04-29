@@ -1,4 +1,16 @@
 date|time|description|vendor|amount
+2024-01-05|10:00:00|Initial funding|Bank|5000.00
+2024-02-14|18:30:00|Valentine's office decor|Target|-35.50
+2024-03-22|09:15:00|Project Alpha Payment|TechCorp|2500.00
+2024-04-10|14:20:00|Monthly Internet|Comcast|-89.99
+2024-05-18|12:45:00|Business lunch|Olive Garden|-55.20
+2024-06-02|08:00:00|June Rent|Landlord|-950.00
+2024-07-20|16:10:00|Software License|Microsoft|-120.00
+2024-08-12|10:30:00|Consulting Fee|Acme Client|1200.00
+2024-09-05|11:00:00|Office Supplies|Staples|-62.15
+2024-10-31|17:00:00|Holiday party supplies|Costco|-150.75
+2024-11-15|09:45:00|Invoice 1044|Northwind|1800.00
+2024-12-20|13:20:00|End of Year Bonus|Bank|1000.00
 2025-01-05|09:15:00|Opening balance deposit|Bank|1000.00
 2025-01-12|13:42:10|Office supplies|Staples|-48.22
 2025-02-03|08:05:33|Consulting invoice paid|Acme Client|1250.00

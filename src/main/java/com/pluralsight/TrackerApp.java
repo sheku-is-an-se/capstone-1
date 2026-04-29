@@ -4,12 +4,11 @@ package com.pluralsight;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-//todo i was thinking of having the transactions stay there until the user presses any key/enter and then it would go back to menu. to be honest, how does that sound?
+
 public class TrackerApp {
     public static Scanner scanner = new Scanner(System.in);
     public static final String TRANSACTIONS_FILE_NAME = "src/main/resources/transactions.csv";
@@ -24,6 +23,30 @@ public class TrackerApp {
                 t.getDate(), t.getTime(), t.getDescription(), t.getVendor(), t.getAmount());
         System.out.println(formatted);
     }
+
+    private static void pause() {
+        String input = "";
+
+        while (!input.equalsIgnoreCase("B")) {
+            System.out.println();
+            System.out.print("Enter B to go back: ");
+            input = scanner.nextLine().trim();
+        }
+    }
+
+    private static String promptForString(String input) {
+        String result = "";
+
+        //// Keep looping as long as the result is just whitespace or empty
+        while (result.trim().isEmpty()) {
+            System.out.println(input);
+            result = scanner.nextLine();
+
+
+        }
+        return result;
+    }
+
 
 
     private static void mainMenu() {
@@ -186,7 +209,7 @@ public class TrackerApp {
 
 
     private static ArrayList<Transaction> loadTransactions(String fileName) {
-        ArrayList<Transaction> transactions = new ArrayList<Transaction>();
+        ArrayList<Transaction> transactions = new ArrayList<>();
         FileReader fileReader = null;
         BufferedReader bufferedReader = null;
 
@@ -260,7 +283,10 @@ public class TrackerApp {
             System.out.println(prompt);
             String userMenu = scanner.nextLine().toUpperCase();
 
+
+
             switch (userMenu) {
+
                 case "A":
                     displayLedger("A");
                     break;
@@ -288,7 +314,8 @@ public class TrackerApp {
     private static void displayLedger(String choice) {
         ArrayList<Transaction> inventory = loadTransactions(TRANSACTIONS_FILE_NAME);
 
-        for (Transaction s : inventory) {
+        for (int i = inventory.size() - 1; i >= 0; i--) {
+            Transaction s = inventory.get(i);
             switch (choice.toUpperCase()) {
                 case "A":
                     printTransaction(s);
@@ -309,6 +336,7 @@ public class TrackerApp {
 
             }
         }
+        pause();
     }
 
 
@@ -353,7 +381,10 @@ public class TrackerApp {
                     displayPreviousYear();
                     break;
                 case "5":
-                    //searchByVendor();
+                    searchByVendor();
+                    break;
+                case "6":
+                    //customSearch();
                     break;
                 case "0": //Go back to ledger menu
                     running = false;
@@ -367,44 +398,51 @@ public class TrackerApp {
 
     }
 
+
     private static void monthToDate() {
         LocalDate today = LocalDate.now();
         int currentYear = today.getYear();
         int currentMonth = today.getMonthValue();
 
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
-        for (Transaction t : transactions) {
-            int transactionMonth = t.getDate().getMonthValue();
-            int transactionYear = t.getDate().getYear();
+        for (int i = transactions.size() - 1; i >= 0; i--) {
+            Transaction s = transactions.get(i);
+            int transactionMonth = s.getDate().getMonthValue();
+            int transactionYear = s.getDate().getYear();
 
-            if (transactionMonth == currentMonth && transactionYear == currentYear && !t.getDate().isAfter(today)) {
-                printTransaction(t);
+            if (transactionMonth == currentMonth && transactionYear == currentYear && !s.getDate().isAfter(today)) {
+                printTransaction(s);
             }
         }
+        pause();
     }
 
     private static void previousMonth() {
         LocalDate today = LocalDate.now();
         LocalDate lastMonth = today.minusMonths(1);
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
-        for (Transaction t : transactions) {
+        for (int i = transactions.size() - 1; i >= 0; i--) {
+            Transaction t = transactions.get(i);
             int transactionMonth = t.getDate().getMonthValue();
             if (transactionMonth == lastMonth.getMonthValue() && t.getDate().getYear() == lastMonth.getYear()) {
                 printTransaction(t);
             }
         }
+        pause();
     }
 
     private static void yearToDate() {
         LocalDate today = LocalDate.now();
         int currentYear = today.getYear();
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
-        for (Transaction t : transactions) {
+        for (int i = transactions.size() - 1; i >= 0; i--) {
+            Transaction t = transactions.get(i);
             int transactionYear = t.getDate().getYear();
             if (transactionYear == currentYear && !t.getDate().isAfter(today)) {
                 printTransaction(t);
             }
         }
+        pause();
     }
 
     private static void displayPreviousYear() {
@@ -412,41 +450,40 @@ public class TrackerApp {
         LocalDate today = LocalDate.now();
         int lastYear = today.getYear() - 1;
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
-        for (Transaction t : transactions) {
+        for (int i = transactions.size() - 1; i >= 0; i--) {
+            Transaction t = transactions.get(i);
             int transactionYear = t.getDate().getYear();
             if (transactionYear == lastYear) {
                 printTransaction(t);
             }
 
         }
+        pause();
     }
 
-    private static void displayReport(int choice) {
+
+    private static void searchByVendor() {
+        System.out.println("Which vendor would you like to search for?");
+        String userInputString = scanner.nextLine();
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
 
-        for (Transaction s : transactions) {
-            switch (choice) {
-                case 1:
-                    printTransaction(s);
-                    break;
-
-                case 2:
-                    if (s.getAmount() > 0) {
-                        printTransaction(s);
-                    }
-                    break;
-
-                case 3:
-                    if (s.getAmount() < 0) {
-                        printTransaction(s);
-                    }
-                    break;
-                default:
-                    throw new RuntimeException("This should never happen!");
+        boolean found = false;
 
 
+        for (int i = transactions.size() - 1; i >= 0; i--) {
+            Transaction t = transactions.get(i);
+            String vendorName = t.getVendor();
+            if (userInputString.equalsIgnoreCase(vendorName)) {
+                printTransaction(t);
+                found = true;
             }
+
         }
+        if (!found) {
+            System.err.println("The vendor does not exist please try again");
+        }
+        pause();
+
     }
 
 
