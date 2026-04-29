@@ -1,6 +1,7 @@
 
 package com.pluralsight;
 
+import java.awt.dnd.DragSource;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -20,9 +21,18 @@ public class TrackerApp {
     }
 
     private static void printTransaction(Transaction transaction) {
-        String formatted = String.format("%s|%s|%s|%s|%.2f",
-                transaction.getDate(), transaction.getTime(), transaction.getDescription(), transaction.getVendor(), transaction.getAmount());
-        System.out.println(formatted);
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+        System.out.println("------------------------------------------------------------------------------------------");
+        System.out.println("Date: " + transaction.getDate() + "   Time: " + transaction.getTime().format(timeFormatter));
+        System.out.println("Desc: " + transaction.getDescription());
+        System.out.println("Vendor: " + transaction.getVendor());
+
+        if (transaction.getAmount() < 0) {
+            System.out.println("Payment: $" + Math.abs(transaction.getAmount()));
+        } else {
+            System.out.println("Deposit: $" + transaction.getAmount());
+        }
     }
 
     private static void pause() {
@@ -38,7 +48,7 @@ public class TrackerApp {
     private static String promptForString(String prompt) {
         String result = "";
 
-        //// Keep looping until the user enters text
+        // Keep looping until the user enters text
         while (result.trim().isEmpty()) {
             System.out.print(prompt);
             result = scanner.nextLine();
@@ -92,9 +102,9 @@ public class TrackerApp {
     private static void mainMenu() {
         String prompt = """
                 ╔══════════════════════════════════════════════╗
-                ║            LEDGERPRO FINANCE HUB            ║
+                ║            LEDGERPRO FINANCE HUB             ║
                 ╠══════════════════════════════════════════════╣
-                ║   Track deposits, payments, and history     ║
+                ║   Track deposits, payments, and history      ║
                 ╚══════════════════════════════════════════════╝
                 
                              MAIN MENU
@@ -227,9 +237,9 @@ public class TrackerApp {
     private static void ledgerMenu() {
         String prompt = """
                 ╔══════════════════════════════════════════════╗
-                ║               LEDGER CENTER                 ║
+                ║               LEDGER CENTER                  ║
                 ╠══════════════════════════════════════════════╣
-                ║      Review transactions and reports        ║
+                ║      Review transactions and reports         ║
                 ╚══════════════════════════════════════════════╝
                 
                                 LEDGER MENU
@@ -254,12 +264,15 @@ public class TrackerApp {
             switch (userMenu) {
 
                 case "A":
+                    System.out.println("==================================== ALL TRANSACTIONS ====================================");
                     displayLedger("A");
                     break;
                 case "D":
+                    System.out.println("================== DEPOSITS ==================");
                     displayLedger("D");
                     break;
                 case "P":
+                    System.out.println("================== PAYMENTS ==================");
                     displayLedger("P");
                     break;
                 case "R":
@@ -309,9 +322,9 @@ public class TrackerApp {
     private static void showReportMenu() {
         String prompt = """
                 ╔══════════════════════════════════════════════╗
-                ║              LEDGERPRO FINANCE HUB          ║
+                ║              LEDGERPRO FINANCE HUB           ║
                 ╠══════════════════════════════════════════════╣
-                ║          Reporting and search tools         ║
+                ║          Reporting and search tools          ║
                 ╚══════════════════════════════════════════════╝
                 
                                 REPORTS MENU
@@ -398,6 +411,9 @@ public class TrackerApp {
         pause();
     }
 
+    /**
+     * Prints the transactions for the current month
+     */
     private static void yearToDate() {
         LocalDate today = LocalDate.now();
         int currentYear = today.getYear();
@@ -411,6 +427,107 @@ public class TrackerApp {
         }
         pause();
     }
+
+    public static ArrayList<Transaction> customFilters() {
+        ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
+        ArrayList<Transaction> transactions1 = new ArrayList<>();
+
+        //ask for start date
+        System.out.println("What is the start date?");
+        String strDate = scanner.nextLine();
+
+
+        //ask for end date
+        System.out.println("What is the end date?");
+        String eDate = scanner.nextLine();
+
+        //ask for description
+        System.out.println("What is the description?");
+        String descPrompt = scanner.nextLine();
+
+        //ask for vendor
+        System.out.println("What is the end date?");
+        String vendPrompt = scanner.nextLine();
+
+        //search for amount
+        System.out.println("What is the amount?");
+        String amount = scanner.nextLine();
+
+        for (int i = transactions.size() - 1; i >= 0; i--) {
+            Transaction result = transactions.get(i);
+            transactions1.add(result);
+        }
+
+        if (strDate.isBlank()) {
+            System.out.println("No start date applied");
+        } else {
+            transactions1 = filterByStartDate(transactions1,strDate);
+        }
+
+        if (eDate.isBlank()) {
+            System.out.println("No end date applied");
+        } else {
+            transactions1 = filterByEndDate(transactions1,eDate);
+        }
+
+        if (descPrompt.isBlank()) {
+            System.out.println("No description applied");
+        } else {
+            transactions1 = filterByDescription(transactions1);
+        }
+
+        if (vendPrompt.isBlank()) {
+            System.out.println("No vendor applied");
+        } else {
+            transactions1 = filterByVendor(transactions1,vendPrompt);
+        }
+
+        if (amount.isBlank()) {
+            System.out.println("No amount applied");
+        } else {
+            transactions1 = filterByAmount(transactions1,amount);
+        }
+
+
+        return transactions1;
+    }
+
+    private static ArrayList<Transaction> filterByVendor(ArrayList<Transaction> result,String prompt) {
+        ArrayList<Transaction> transactions1 = new ArrayList<>();
+        for (Transaction transaction : result) {
+            if (prompt.equalsIgnoreCase(transaction.getVendor())) {
+                transactions1.add(transaction);
+            }
+
+        }
+        return transactions1;
+    }
+
+
+    private static ArrayList<Transaction> filterByAmount(ArrayList<Transaction> result,String prompt) {
+        ArrayList<Transaction> transactions1 = new ArrayList<>();
+
+        Double amountPrompt = Double.parseDouble(prompt);
+        return transactions1;
+    }
+
+    private static ArrayList<Transaction> filterByDescription(ArrayList<Transaction> result) {
+        ArrayList<Transaction> transactions1 = new ArrayList<>();
+        return transactions1;
+    }
+
+    private static ArrayList<Transaction> filterByEndDate(ArrayList<Transaction> result,String prompt) {
+        ArrayList<Transaction> transactions1 = new ArrayList<>();
+        LocalDate endDatePrompt = LocalDate.parse(prompt);
+        return transactions1;
+    }
+
+    private static ArrayList<Transaction> filterByStartDate(ArrayList<Transaction> result,String prompt) {
+        ArrayList<Transaction> transactions1 = new ArrayList<>();
+        LocalDate startDatePrompt = LocalDate.parse(prompt);
+        return transactions1;
+    }
+
 
     private static void displayPreviousYear() {
 
