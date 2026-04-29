@@ -5,6 +5,7 @@ import java.awt.dnd.DragSource;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -446,7 +447,7 @@ public class TrackerApp {
         String descPrompt = scanner.nextLine();
 
         //ask for vendor
-        System.out.println("What is the end date?");
+        System.out.println("What is the vendor?");
         String vendPrompt = scanner.nextLine();
 
         //search for amount
@@ -473,7 +474,7 @@ public class TrackerApp {
         if (descPrompt.isBlank()) {
             System.out.println("No description applied");
         } else {
-            transactions1 = filterByDescription(transactions1);
+            transactions1 = filterByDescription(transactions1,descPrompt);
         }
 
         if (vendPrompt.isBlank()) {
@@ -488,8 +489,13 @@ public class TrackerApp {
             transactions1 = filterByAmount(transactions1,amount);
         }
 
+        for(Transaction transaction : transactions1){
+            printTransaction(transaction);
+            pause();
+        }
 
         return transactions1;
+
     }
 
     private static ArrayList<Transaction> filterByVendor(ArrayList<Transaction> result,String prompt) {
@@ -507,18 +513,39 @@ public class TrackerApp {
     private static ArrayList<Transaction> filterByAmount(ArrayList<Transaction> result,String prompt) {
         ArrayList<Transaction> transactions1 = new ArrayList<>();
 
-        Double amountPrompt = Double.parseDouble(prompt);
+        for (Transaction transaction : result) {
+            Double vendPrompt = Double.parseDouble(prompt);
+            if (Double.compare(vendPrompt, transaction.getAmount()) == 0) {
+                transactions1.add(transaction);
+            }
+
+        }
         return transactions1;
     }
 
-    private static ArrayList<Transaction> filterByDescription(ArrayList<Transaction> result) {
+    private static ArrayList<Transaction> filterByDescription(ArrayList<Transaction> result,String prompt) {
         ArrayList<Transaction> transactions1 = new ArrayList<>();
+        for (Transaction transaction : result) {
+            if (prompt.equalsIgnoreCase(transaction.getDescription())) {
+                transactions1.add(transaction);
+            }
+
+        }
         return transactions1;
     }
 
     private static ArrayList<Transaction> filterByEndDate(ArrayList<Transaction> result,String prompt) {
         ArrayList<Transaction> transactions1 = new ArrayList<>();
-        LocalDate endDatePrompt = LocalDate.parse(prompt);
+        LocalDate today = LocalDate.now();
+
+
+        for (Transaction transaction : result) {
+            LocalDate endDatePrompt = LocalDate.parse(prompt);
+            if (!endDatePrompt.isAfter(transaction.getDate())) {
+                transactions1.add(transaction);
+            }
+
+        }
         return transactions1;
     }
 
