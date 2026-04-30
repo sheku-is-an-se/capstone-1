@@ -100,20 +100,22 @@ public class TrackerApp {
 
     private static void mainMenu() {
         String prompt = """
+                                      
+                                      𓅓
                 ╔══════════════════════════════════════════════╗
                 ║            LEDGERPRO FINANCE HUB             ║
                 ╠══════════════════════════════════════════════╣
                 ║   Track deposits, payments, and history      ║
                 ╚══════════════════════════════════════════════╝
                 
-                             MAIN MENU
-                ----------------------------------------------
+                                   MAIN MENU
+                ------------------------------------------------
                 [D] Add Deposit
                 [P] Make Payment (Debit)
                 [L] View Ledger
                 [S] Summary
                 [X] Exit Application
-                ----------------------------------------------
+                ------------------------------------------------
                 Enter your choice: 
                 """;
 
@@ -198,10 +200,10 @@ public class TrackerApp {
             fileReader = new FileReader(fileName);
             bufferedReader = new BufferedReader(fileReader);
 
-            String line = bufferedReader.readLine();
+            //skip the header
+            bufferedReader.readLine();
 
-            // skip the header row
-            line = bufferedReader.readLine();
+            String line = bufferedReader.readLine();
 
             while (line != null) {
                 Transaction transaction = parseTransaction(line);
