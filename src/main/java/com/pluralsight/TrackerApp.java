@@ -77,8 +77,8 @@ public class TrackerApp {
             try {
                 System.out.println(message);
                 String amountInput = scanner.nextLine();
-                Double result = Double.parseDouble(amountInput);
-                return result;
+                return Double.parseDouble(amountInput);
+
             } catch (NumberFormatException e) {
                 System.err.println("Invalid selection, please type a number.");
             }
@@ -111,6 +111,7 @@ public class TrackerApp {
                 [D] Add Deposit
                 [P] Make Payment (Debit)
                 [L] View Ledger
+                [S] Summary
                 [X] Exit Application
                 ----------------------------------------------
                 Enter your choice: 
@@ -135,6 +136,9 @@ public class TrackerApp {
                     break;
                 case "L":
                     ledgerMenu();
+                    break;
+                case "S":
+                    showSummary();
                     break;
                 case "X":
                     running = false;
@@ -187,8 +191,8 @@ public class TrackerApp {
 
     private static ArrayList<Transaction> loadTransactions(String fileName) {
         ArrayList<Transaction> transactions = new ArrayList<>();
-        FileReader fileReader = null;
-        BufferedReader bufferedReader = null;
+        FileReader fileReader;
+        BufferedReader bufferedReader;
 
         try {
             fileReader = new FileReader(fileName);
@@ -613,6 +617,90 @@ public class TrackerApp {
 
         } while (keepRunning);
     }
+
+    private static void showSummary() {
+        ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
+
+        double balance = getCurrentBalance(transactions);
+        double totalDeposits = getTotalDeposits(transactions);
+        double totalPayments = getTotalPayments(transactions);
+        double largestPayment = getLargestPayment();
+
+        System.out.println("Current Balance: $" + String.format("%,.2f", balance));
+        System.out.println("Total Deposits: $" + String.format("%,.2f", totalDeposits));
+        System.out.println("Total Payments: $" + String.format("%,.2f", totalPayments));
+        System.out.println("Largest Payment: $" + largestPayment);
+    }
+
+    private static double getCurrentBalance(ArrayList<Transaction> transactions) {
+
+        double payments = 0.0;
+        double deposits = 0.0;
+
+        for(Transaction transaction : transactions){
+            if(transaction.getAmount() < 0){
+                payments+=transaction.getAmount();
+            }else{
+                deposits+= transaction.getAmount();
+            }
+
+        }
+        return Double.sum(payments,deposits);
+
+    }
+
+    private static double getTotalDeposits(ArrayList<Transaction> transactions) {
+        double deposits = 0.0;
+
+        for(Transaction transaction : transactions){
+            if(transaction.getAmount() > 0){
+                deposits+=transaction.getAmount();
+            }
+
+        }
+        return deposits;
+
+    }
+
+    private static double getTotalPayments(ArrayList<Transaction> transactions) {
+        double payments = 0.0;
+
+        for(Transaction transaction : transactions){
+            if(transaction.getAmount() < 0){
+                payments+=Math.abs(transaction.getAmount());
+            }
+
+        }
+        return payments;
+    }
+
+    private static Double getLargestPayment() {
+        ArrayList<Double> payments = new ArrayList<>();
+        ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
+
+        for(Transaction transaction : transactions){
+            if(transaction.getAmount() < 0){
+                payments.add(transaction.getAmount());
+            }
+
+
+
+        }
+
+        Double largest = payments.get(0);
+
+        for (int s = 1; s < payments.size(); s++){
+            if (payments.get(s) < largest) {
+                largest = payments.get(s);
+            }
+        }
+
+
+
+        return Math.abs(largest);
+    }
+
+
 
 
 }
