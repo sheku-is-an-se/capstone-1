@@ -1,7 +1,7 @@
 # LedgerPro Finance Hub
 
 ## Overview
-LedgerPro Finance Hub is a Java command-line application created for Capstone Project 1. The program allows users to record financial transactions, including deposits and payments, and store them in a transaction file. It also gives users the ability to view their ledger, search transaction history, run reports, and see a financial summary.
+LedgerPro Finance Hub is a Java command-line application. The program allows users to record financial transactions, including deposits and payments, and store them in a transaction file. It also gives users the ability to view their ledger, search transaction history, run reports, and see a financial summary.
 
 ## Features
 - Add deposits
