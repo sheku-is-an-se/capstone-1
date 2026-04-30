@@ -267,15 +267,21 @@ public class TrackerApp {
             switch (userMenu) {
 
                 case "A":
-                    System.out.println("==================================== ALL TRANSACTIONS ====================================");
+                    System.out.println("========================================================================");
+                    System.out.println("                          ALL TRANSACTIONS");
+                    System.out.println("========================================================================");
                     displayLedger("A");
                     break;
                 case "D":
-                    System.out.println("================== DEPOSITS ==================");
+                    System.out.println("========================================================================");
+                    System.out.println("                             DEPOSITS");
+                    System.out.println("========================================================================");
                     displayLedger("D");
                     break;
                 case "P":
-                    System.out.println("================== PAYMENTS ==================");
+                    System.out.println("========================================================================");
+                    System.out.println("                             PAYMENTS");
+                    System.out.println("========================================================================");
                     displayLedger("P");
                     break;
                 case "R":
@@ -642,15 +648,14 @@ public class TrackerApp {
         double totalPayments = getTotalPayments(transactions);
         double largestPayment = getLargestPayment(transactions);
 
-
-        System.out.println("╔════════════════════════════════════════════╗");
-        System.out.println("║             FINANCIAL SUMMARY              ║");
-        System.out.println("╠════════════════════════════════════════════╣");
-        System.out.println("║ Current Balance:     $" + String.format("%,.2f", balance) + "            ║");
-        System.out.println("║ Total Deposits:      $" + String.format("%,.2f", totalDeposits) + "            ║");
-        System.out.println("║ Total Payments:      $" + String.format("%,.2f", totalPayments) + "             ║");
-        System.out.println("║ Largest Payment:     $" + String.format("%,.2f", largestPayment) + "               ║");
-        System.out.println("╚════════════════════════════════════════════╝");
+        System.out.println("====================================");
+        System.out.println("         FINANCIAL SUMMARY");
+        System.out.println("====================================");
+        System.out.println("Current Balance:  $" + String.format("%,.2f", balance));
+        System.out.println("Total Deposits:   $" + String.format("%,.2f", totalDeposits));
+        System.out.println("Total Payments:   $" + String.format("%,.2f", totalPayments));
+        System.out.println("Largest Payment:  $" + String.format("%,.2f", largestPayment));
+        System.out.println("====================================");
 
         pause();
     }
