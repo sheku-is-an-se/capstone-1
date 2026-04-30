@@ -69,7 +69,7 @@ public class TrackerApp {
         }
     }
 
-    private static Double promptForAmount(String message) {
+    private static double promptForAmount(String message) {
 
         //// Keep looping as long as the result is just whitespace or empty
 
@@ -464,34 +464,50 @@ public class TrackerApp {
         if (strDate.isBlank()) {
             System.out.println("No start date applied");
         } else {
-            transactions1 = filterByStartDate(transactions1,strDate);
+            try {
+                LocalDate.parse(strDate);
+                transactions1 = filterByStartDate(transactions1, strDate);
+            } catch (DateTimeParseException e) {
+                System.err.println("Invalid start date. Skipping start date filter.");
+            }
         }
 
         if (eDate.isBlank()) {
             System.out.println("No end date applied");
         } else {
-            transactions1 = filterByEndDate(transactions1,eDate);
-        }
-
-        if (descPrompt.isBlank()) {
-            System.out.println("No description applied");
-        } else {
-            transactions1 = filterByDescription(transactions1,descPrompt);
-        }
-
-        if (vendPrompt.isBlank()) {
-            System.out.println("No vendor applied");
-        } else {
-            transactions1 = filterByVendor(transactions1,vendPrompt);
+            try {
+                LocalDate.parse(eDate);
+                transactions1 = filterByEndDate(transactions1, eDate);
+            } catch (DateTimeParseException e) {
+                System.err.println("Invalid end date. Skipping end date filter.");
+            }
         }
 
         if (amount.isBlank()) {
             System.out.println("No amount applied");
         } else {
-            transactions1 = filterByAmount(transactions1,amount);
+            try {
+                Double.parseDouble(amount);
+                transactions1 = filterByAmount(transactions1, amount);
+            } catch (NumberFormatException e) {
+                System.err.println("Invalid amount. Skipping amount filter.");
+            }
         }
 
-        for(Transaction transaction : transactions1){
+        if (descPrompt.isBlank()) {
+            System.out.println("No description applied");
+        } else {
+            transactions1 = filterByDescription(transactions1, descPrompt);
+        }
+
+        if (vendPrompt.isBlank()) {
+            System.out.println("No vendor applied");
+        } else {
+            transactions1 = filterByVendor(transactions1, vendPrompt);
+        }
+
+
+        for (Transaction transaction : transactions1) {
             printTransaction(transaction);
         }
         pause();
@@ -499,7 +515,7 @@ public class TrackerApp {
 
     }
 
-    private static ArrayList<Transaction> filterByVendor(ArrayList<Transaction> result,String prompt) {
+    private static ArrayList<Transaction> filterByVendor(ArrayList<Transaction> result, String prompt) {
         ArrayList<Transaction> transactions1 = new ArrayList<>();
         for (Transaction transaction : result) {
             if (prompt.equalsIgnoreCase(transaction.getVendor())) {
@@ -511,9 +527,9 @@ public class TrackerApp {
     }
 
 
-    private static ArrayList<Transaction> filterByAmount(ArrayList<Transaction> result,String prompt) {
+    private static ArrayList<Transaction> filterByAmount(ArrayList<Transaction> result, String prompt) {
         ArrayList<Transaction> transactions1 = new ArrayList<>();
-        Double vendPrompt = Double.parseDouble(prompt);
+        double vendPrompt = Double.parseDouble(prompt);
 
         for (Transaction transaction : result) {
 
@@ -525,7 +541,7 @@ public class TrackerApp {
         return transactions1;
     }
 
-    private static ArrayList<Transaction> filterByDescription(ArrayList<Transaction> result,String prompt) {
+    private static ArrayList<Transaction> filterByDescription(ArrayList<Transaction> result, String prompt) {
         ArrayList<Transaction> transactions1 = new ArrayList<>();
         for (Transaction transaction : result) {
             if (prompt.equalsIgnoreCase(transaction.getDescription())) {
@@ -536,7 +552,7 @@ public class TrackerApp {
         return transactions1;
     }
 
-    private static ArrayList<Transaction> filterByEndDate(ArrayList<Transaction> result,String prompt) {
+    private static ArrayList<Transaction> filterByEndDate(ArrayList<Transaction> result, String prompt) {
         ArrayList<Transaction> transactions1 = new ArrayList<>();
         LocalDate endDatePrompt = LocalDate.parse(prompt);
 
@@ -550,7 +566,7 @@ public class TrackerApp {
         return transactions1;
     }
 
-    private static ArrayList<Transaction> filterByStartDate(ArrayList<Transaction> result,String prompt) {
+    private static ArrayList<Transaction> filterByStartDate(ArrayList<Transaction> result, String prompt) {
         ArrayList<Transaction> transactions1 = new ArrayList<>();
         LocalDate startDatePrompt = LocalDate.parse(prompt);
 
@@ -624,37 +640,45 @@ public class TrackerApp {
         double balance = getCurrentBalance(transactions);
         double totalDeposits = getTotalDeposits(transactions);
         double totalPayments = getTotalPayments(transactions);
-        double largestPayment = getLargestPayment();
+        double largestPayment = getLargestPayment(transactions);
 
-        System.out.println("Current Balance: $" + String.format("%,.2f", balance));
-        System.out.println("Total Deposits: $" + String.format("%,.2f", totalDeposits));
-        System.out.println("Total Payments: $" + String.format("%,.2f", totalPayments));
-        System.out.println("Largest Payment: $" + largestPayment);
+
+        System.out.println("╔════════════════════════════════════════════╗");
+        System.out.println("║             FINANCIAL SUMMARY              ║");
+        System.out.println("╠════════════════════════════════════════════╣");
+        System.out.println("║ Current Balance:     $" + String.format("%,.2f", balance) + "            ║");
+        System.out.println("║ Total Deposits:      $" + String.format("%,.2f", totalDeposits) + "            ║");
+        System.out.println("║ Total Payments:      $" + String.format("%,.2f", totalPayments) + "             ║");
+        System.out.println("║ Largest Payment:     $" + String.format("%,.2f", largestPayment) + "               ║");
+        System.out.println("╚════════════════════════════════════════════╝");
+
+        pause();
     }
+
 
     private static double getCurrentBalance(ArrayList<Transaction> transactions) {
 
         double payments = 0.0;
         double deposits = 0.0;
 
-        for(Transaction transaction : transactions){
-            if(transaction.getAmount() < 0){
-                payments+=transaction.getAmount();
-            }else{
-                deposits+= transaction.getAmount();
+        for (Transaction transaction : transactions) {
+            if (transaction.getAmount() < 0) {
+                payments += transaction.getAmount();
+            } else {
+                deposits += transaction.getAmount();
             }
 
         }
-        return Double.sum(payments,deposits);
+        return Double.sum(payments, deposits);
 
     }
 
     private static double getTotalDeposits(ArrayList<Transaction> transactions) {
         double deposits = 0.0;
 
-        for(Transaction transaction : transactions){
-            if(transaction.getAmount() > 0){
-                deposits+=transaction.getAmount();
+        for (Transaction transaction : transactions) {
+            if (transaction.getAmount() > 0) {
+                deposits += transaction.getAmount();
             }
 
         }
@@ -665,42 +689,41 @@ public class TrackerApp {
     private static double getTotalPayments(ArrayList<Transaction> transactions) {
         double payments = 0.0;
 
-        for(Transaction transaction : transactions){
-            if(transaction.getAmount() < 0){
-                payments+=Math.abs(transaction.getAmount());
+        for (Transaction transaction : transactions) {
+            if (transaction.getAmount() < 0) {
+                payments += Math.abs(transaction.getAmount());
             }
 
         }
         return payments;
     }
 
-    private static Double getLargestPayment() {
+    private static double getLargestPayment(ArrayList<Transaction> transactions) {
         ArrayList<Double> payments = new ArrayList<>();
-        ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
 
-        for(Transaction transaction : transactions){
-            if(transaction.getAmount() < 0){
+        for (Transaction transaction : transactions) {
+            if (transaction.getAmount() < 0) {
                 payments.add(transaction.getAmount());
             }
 
 
-
+        }
+        if (payments.isEmpty()) {
+            return 0.0;
         }
 
-        Double largest = payments.get(0);
+        double largest = payments.get(0);
 
-        for (int s = 1; s < payments.size(); s++){
+        for (int s = 1; s < payments.size(); s++) {
+            //all negatives so the lowest would technically be the highest
             if (payments.get(s) < largest) {
                 largest = payments.get(s);
             }
         }
 
 
-
         return Math.abs(largest);
     }
-
-
 
 
 }
