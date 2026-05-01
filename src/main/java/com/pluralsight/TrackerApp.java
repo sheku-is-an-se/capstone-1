@@ -21,7 +21,6 @@ public class TrackerApp {
 
     private static void printTransaction(Transaction transaction) {
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-
         System.out.println("------------------------------------------------------------------------------------------");
         System.out.println("Date: " + transaction.getDate() + "   Time: " + transaction.getTime().format(timeFormatter));
         System.out.println("Desc: " + transaction.getDescription());
@@ -36,7 +35,6 @@ public class TrackerApp {
 
     private static void pause() {
         String input = "";
-
         while (!input.equalsIgnoreCase("B")) {
             System.out.println();
             System.out.print("Enter B to go back: ");
@@ -46,7 +44,6 @@ public class TrackerApp {
 
     private static String promptForString(String prompt) {
         String result = "";
-
         // Keep looping until the user enters text
         while (result.trim().isEmpty()) {
             System.out.print(prompt);
@@ -185,11 +182,9 @@ public class TrackerApp {
         saveTransaction(true);
     }
 
-
     private static void makePayment() {
         saveTransaction(false);
     }
-
 
     private static ArrayList<Transaction> loadTransactions(String fileName) {
         ArrayList<Transaction> transactions = new ArrayList<>();
@@ -199,12 +194,10 @@ public class TrackerApp {
         try {
             fileReader = new FileReader(fileName);
             bufferedReader = new BufferedReader(fileReader);
-
             //skip the header
             bufferedReader.readLine();
-
             String line = bufferedReader.readLine();
-
+            //While there is something to read, parse the line, add it to the array list and move on the next line
             while (line != null) {
                 Transaction transaction = parseTransaction(line);
                 transactions.add(transaction);
@@ -217,27 +210,24 @@ public class TrackerApp {
             System.out.println("Error loading transactions file: " + ex);
             throw new RuntimeException(ex);
         }
-
         return transactions;
     }
 
     private static Transaction parseTransaction(String line) {
+        //Split line by pipe
         String[] parts = line.split("\\|");
-
         if (parts.length != 5) {
             throw new RuntimeException("Unexpected number of fields");
-
         }
-
+        //Turn into usable parts
         LocalDate date = LocalDate.parse(parts[0]);
         LocalTime time = LocalTime.parse(parts[1]);
         String description = parts[2];
         String vendor = parts[3];
         double amount = Double.parseDouble(parts[4]);
-
+        //Returns a transaction object using parameters defined in the Transaction Class
         return new Transaction(date, time, description, vendor, amount);
     }
-
 
     private static void ledgerMenu() {
         String prompt = """
@@ -257,7 +247,7 @@ public class TrackerApp {
                 ------------------------------------------------
                 Enter your choice:
                 """;
-
+        //Initialize a way to end this screen and go back based on user choice
         boolean running = true;
 
 
@@ -303,7 +293,6 @@ public class TrackerApp {
 
     private static void displayLedger(String choice) {
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
-
         for (int i = transactions.size() - 1; i >= 0; i--) {
             Transaction transaction = transactions.get(i);
             switch (choice.toUpperCase()) {
@@ -322,13 +311,10 @@ public class TrackerApp {
                         printTransaction(transaction);
                     }
                     break;
-
-
             }
         }
         pause();
     }
-
 
     private static void showReportMenu() {
         String prompt = """
@@ -353,7 +339,6 @@ public class TrackerApp {
 
         boolean running = true;
 
-
         do {
             System.out.println(prompt);
             String userMenu = scanner.nextLine();
@@ -368,7 +353,7 @@ public class TrackerApp {
                 case "3":
                     yearToDate();
                     break;
-                case "4": //previous year
+                case "4":
                     displayPreviousYear();
                     break;
                 case "5":
@@ -391,16 +376,18 @@ public class TrackerApp {
 
 
     private static void monthToDate() {
+        //Get today's date,month and year
         LocalDate today = LocalDate.now();
         int currentYear = today.getYear();
         int currentMonth = today.getMonthValue();
 
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
+        //Loop the transactions and reverse list
         for (int i = transactions.size() - 1; i >= 0; i--) {
             Transaction transaction = transactions.get(i);
             int transactionMonth = transaction.getDate().getMonthValue();
             int transactionYear = transaction.getDate().getYear();
-
+            //Condition to get month to date
             if (transactionMonth == currentMonth && transactionYear == currentYear && !transaction.getDate().isAfter(today)) {
                 printTransaction(transaction);
             }
@@ -412,9 +399,11 @@ public class TrackerApp {
         LocalDate today = LocalDate.now();
         LocalDate lastMonth = today.minusMonths(1);
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
+        //Loop and reverse list
         for (int i = transactions.size() - 1; i >= 0; i--) {
             Transaction transaction = transactions.get(i);
             int transactionMonth = transaction.getDate().getMonthValue();
+            //A condition to get previous month
             if (transactionMonth == lastMonth.getMonthValue() && transaction.getDate().getYear() == lastMonth.getYear()) {
                 printTransaction(transaction);
             }
@@ -422,16 +411,16 @@ public class TrackerApp {
         pause();
     }
 
-    /**
-     * Prints the transactions for the current month
-     */
     private static void yearToDate() {
+        //Get current year and today's date
         LocalDate today = LocalDate.now();
         int currentYear = today.getYear();
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
+        //Loop through transactions and reverse the list
         for (int i = transactions.size() - 1; i >= 0; i--) {
             Transaction transaction = transactions.get(i);
             int transactionYear = transaction.getDate().getYear();
+            //Condition for year to date
             if (transactionYear == currentYear && !transaction.getDate().isAfter(today)) {
                 printTransaction(transaction);
             }
@@ -468,11 +457,12 @@ public class TrackerApp {
             Transaction result = transactions.get(i);
             transactions1.add(result);
         }
-
+        //If start date is blank, then print output
         if (strDate.isBlank()) {
             System.out.println("No start date applied");
         } else {
             try {
+                //Turn the string into a local date to be able to use for comparing in a condition
                 LocalDate.parse(strDate);
                 transactions1 = filterByStartDate(transactions1, strDate);
             } catch (DateTimeParseException e) {
@@ -538,13 +528,10 @@ public class TrackerApp {
     private static ArrayList<Transaction> filterByAmount(ArrayList<Transaction> result, String prompt) {
         ArrayList<Transaction> transactions1 = new ArrayList<>();
         double vendPrompt = Double.parseDouble(prompt);
-
         for (Transaction transaction : result) {
-
             if (Double.compare(vendPrompt, transaction.getAmount()) == 0) {
                 transactions1.add(transaction);
             }
-
         }
         return transactions1;
     }
@@ -555,7 +542,6 @@ public class TrackerApp {
             if (prompt.equalsIgnoreCase(transaction.getDescription())) {
                 transactions1.add(transaction);
             }
-
         }
         return transactions1;
     }
@@ -563,13 +549,10 @@ public class TrackerApp {
     private static ArrayList<Transaction> filterByEndDate(ArrayList<Transaction> result, String prompt) {
         ArrayList<Transaction> transactions1 = new ArrayList<>();
         LocalDate endDatePrompt = LocalDate.parse(prompt);
-
-
         for (Transaction transaction : result) {
             if (!endDatePrompt.isBefore(transaction.getDate())) {
                 transactions1.add(transaction);
             }
-
         }
         return transactions1;
     }
@@ -577,20 +560,15 @@ public class TrackerApp {
     private static ArrayList<Transaction> filterByStartDate(ArrayList<Transaction> result, String prompt) {
         ArrayList<Transaction> transactions1 = new ArrayList<>();
         LocalDate startDatePrompt = LocalDate.parse(prompt);
-
-
         for (Transaction transaction : result) {
             if (!startDatePrompt.isAfter(transaction.getDate())) {
                 transactions1.add(transaction);
             }
-
         }
         return transactions1;
     }
 
-
     private static void displayPreviousYear() {
-
         LocalDate today = LocalDate.now();
         int lastYear = today.getYear() - 1;
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
@@ -600,11 +578,9 @@ public class TrackerApp {
             if (transactionYear == lastYear) {
                 printTransaction(transaction);
             }
-
         }
         pause();
     }
-
 
     private static void searchByVendor() {
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
@@ -618,7 +594,7 @@ public class TrackerApp {
                 return;
             }
 
-            // 1. Searches and reverses the list
+            //Searches and reverses the list
             for (int i = transactions.size() - 1; i >= 0; i--) {
                 Transaction transaction = transactions.get(i);
                 if (vendorName.equalsIgnoreCase(transaction.getVendor())) {
@@ -627,7 +603,7 @@ public class TrackerApp {
                 }
             }
 
-            // 2. Handle the results
+            //Handle the results
             if (found) {
                 pause(); // Allow user to read transactions first
                 String choice = promptForString("Do you want to search for more? (yes/no): ");
@@ -664,7 +640,6 @@ public class TrackerApp {
 
 
     private static double getCurrentBalance(ArrayList<Transaction> transactions) {
-
         double payments = 0.0;
         double deposits = 0.0;
 
@@ -674,10 +649,8 @@ public class TrackerApp {
             } else {
                 deposits += transaction.getAmount();
             }
-
         }
         return Double.sum(payments, deposits);
-
     }
 
     private static double getTotalDeposits(ArrayList<Transaction> transactions) {
@@ -687,10 +660,8 @@ public class TrackerApp {
             if (transaction.getAmount() > 0) {
                 deposits += transaction.getAmount();
             }
-
         }
         return deposits;
-
     }
 
     private static double getTotalPayments(ArrayList<Transaction> transactions) {
@@ -700,7 +671,6 @@ public class TrackerApp {
             if (transaction.getAmount() < 0) {
                 payments += Math.abs(transaction.getAmount());
             }
-
         }
         return payments;
     }
@@ -712,13 +682,11 @@ public class TrackerApp {
             if (transaction.getAmount() < 0) {
                 payments.add(transaction.getAmount());
             }
-
-
         }
         if (payments.isEmpty()) {
             return 0.0;
         }
-
+        //Start from the first index ( used to compare if the next number is bigger )
         double largest = payments.get(0);
 
         for (int s = 1; s < payments.size(); s++) {
@@ -727,12 +695,8 @@ public class TrackerApp {
                 largest = payments.get(s);
             }
         }
-
-
         return Math.abs(largest);
     }
-
-
 }
 
 
