@@ -18,7 +18,7 @@ public class LedgerPro {
         mainMenu();
         System.out.println("Thank you, come back soon!");
     }
-
+    //helper method to print transaction
     private static void printTransaction(Transaction transaction) {
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         System.out.println("------------------------------------------------------------------------------------------");
@@ -32,7 +32,7 @@ public class LedgerPro {
             System.out.println("Deposit: $" + transaction.getAmount());
         }
     }
-
+    //pause after a transaction to allow user time to read
     private static void pause() {
         String input = "";
         while (!input.equalsIgnoreCase("B")) {
@@ -92,7 +92,7 @@ public class LedgerPro {
             }
         }
     }
-
+    //Main menu
     private static void mainMenu() {
         String prompt = """
                                       
@@ -263,7 +263,6 @@ public class LedgerPro {
             System.out.println(prompt);
             String userMenu = scanner.nextLine().toUpperCase();
 
-
             switch (userMenu) {
 
                 case "A":
@@ -375,10 +374,7 @@ public class LedgerPro {
                     break;
             }
         } while (running);
-
-
     }
-
 
     private static void monthToDate() {
         //Get today's date,month and year
@@ -432,24 +428,18 @@ public class LedgerPro {
     public static ArrayList<Transaction> customFilters() {
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
         ArrayList<Transaction> filteredTransactions = new ArrayList<>();
-
         //ask for start date
         System.out.println("What is the start date? (yyyy-MM-dd)");
         String startDateInput = scanner.nextLine();
-
-
         //ask for end date
         System.out.println("What is the end date? (yyyy-MM-DD)");
         String endDateInput = scanner.nextLine();
-
         //ask for description
         System.out.println("What is the description?");
         String descriptionInput = scanner.nextLine();
-
         //ask for vendor
         System.out.println("What is the vendor?");
         String vendorInput = scanner.nextLine();
-
         //search for amount
         System.out.println("What is the amount?");
         String amountInput = scanner.nextLine();
@@ -469,9 +459,6 @@ public class LedgerPro {
                 System.err.println("Invalid start date. Skipping start date filter.");
             }
         }
-/*
-If end date is blank then print output. If it isn't blank then turn it into a local date and filter it. If the user doesn't type a valid end date, the terminal catches the error and tells the user that their input was invalid and skips on ahead
- */
         if (endDateInput.isBlank()) {
             System.out.println("No end date applied");
         } else {
@@ -597,7 +584,6 @@ If end date is blank then print output. If it isn't blank then turn it into a lo
                     found = true;
                 }
             }
-
             //Handle the results
             if (found) {
                 pause(); // Allow user to read transactions first
@@ -607,9 +593,7 @@ If end date is blank then print output. If it isn't blank then turn it into a lo
                 }
             } else {
                 System.err.println("Vendor not found. Try again, or type 'exit' to return.");
-
             }
-
         } while (keepRunning);
     }
 
