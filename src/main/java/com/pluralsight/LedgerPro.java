@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 
-public class TrackerApp {
+public class LedgerPro {
     public static Scanner scanner = new Scanner(System.in);
     public static final String TRANSACTIONS_FILE_NAME = "src/main/resources/transactions.csv";
 
