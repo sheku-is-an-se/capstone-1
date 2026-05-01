@@ -204,6 +204,19 @@ public class TrackerApp {
                 line = bufferedReader.readLine();
             }
             bufferedReader.close();
+
+            //Sorting logic (sort from newest to oldest)
+            transactions.sort((t1, t2) -> {
+                // First, compare the dates
+                int dateCompare = t2.getDate().compareTo(t1.getDate());
+                if (dateCompare == 0) {
+                    // If the dates are identical, then compare the times
+                    return t2.getTime().compareTo(t1.getTime());
+                }
+                return dateCompare;
+            });
+
+
         } catch (FileNotFoundException fne) {
             System.err.println("File not found: " + fileName);
         } catch (IOException ex) {
@@ -293,22 +306,21 @@ public class TrackerApp {
 
     private static void displayLedger(String choice) {
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
-        for (int i = transactions.size() - 1; i >= 0; i--) {
-            Transaction transaction = transactions.get(i);
+        for (Transaction currentTransaction : transactions){
             switch (choice.toUpperCase()) {
                 case "A":
-                    printTransaction(transaction);
+                    printTransaction(currentTransaction);
                     break;
 
                 case "D":
-                    if (transaction.getAmount() > 0) {
-                        printTransaction(transaction);
+                    if (currentTransaction.getAmount() > 0) {
+                        printTransaction(currentTransaction);
                     }
                     break;
 
                 case "P":
-                    if (transaction.getAmount() < 0) {
-                        printTransaction(transaction);
+                    if (currentTransaction.getAmount() < 0) {
+                        printTransaction(currentTransaction);
                     }
                     break;
             }
@@ -382,14 +394,12 @@ public class TrackerApp {
         int currentMonth = today.getMonthValue();
 
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
-        //Loop the transactions and reverse list
-        for (int i = transactions.size() - 1; i >= 0; i--) {
-            Transaction transaction = transactions.get(i);
-            int transactionMonth = transaction.getDate().getMonthValue();
-            int transactionYear = transaction.getDate().getYear();
+        for (Transaction currentTransaction : transactions) {
+            int transactionMonth = currentTransaction.getDate().getMonthValue();
+            int transactionYear = currentTransaction.getDate().getYear();
             //Condition to get month to date
-            if (transactionMonth == currentMonth && transactionYear == currentYear && !transaction.getDate().isAfter(today)) {
-                printTransaction(transaction);
+            if (transactionMonth == currentMonth && transactionYear == currentYear && !currentTransaction.getDate().isAfter(today)) {
+                printTransaction(currentTransaction);
             }
         }
         pause();
@@ -399,13 +409,12 @@ public class TrackerApp {
         LocalDate today = LocalDate.now();
         LocalDate lastMonth = today.minusMonths(1);
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
-        //Loop and reverse list
-        for (int i = transactions.size() - 1; i >= 0; i--) {
-            Transaction transaction = transactions.get(i);
-            int transactionMonth = transaction.getDate().getMonthValue();
+
+        for (Transaction currentTransaction : transactions) {
+            int transactionMonth = currentTransaction.getDate().getMonthValue();
             //A condition to get previous month
-            if (transactionMonth == lastMonth.getMonthValue() && transaction.getDate().getYear() == lastMonth.getYear()) {
-                printTransaction(transaction);
+            if (transactionMonth == lastMonth.getMonthValue() && currentTransaction.getDate().getYear() == lastMonth.getYear()) {
+                printTransaction(currentTransaction);
             }
         }
         pause();
@@ -416,13 +425,12 @@ public class TrackerApp {
         LocalDate today = LocalDate.now();
         int currentYear = today.getYear();
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
-        //Loop through transactions and reverse the list
-        for (int i = transactions.size() - 1; i >= 0; i--) {
-            Transaction transaction = transactions.get(i);
-            int transactionYear = transaction.getDate().getYear();
+
+        for (Transaction currentTransaction : transactions) {
+            int transactionYear = currentTransaction.getDate().getYear();
             //Condition for year to date
-            if (transactionYear == currentYear && !transaction.getDate().isAfter(today)) {
-                printTransaction(transaction);
+            if (transactionYear == currentYear && !currentTransaction.getDate().isAfter(today)) {
+                printTransaction(currentTransaction);
             }
         }
         pause();
@@ -433,12 +441,12 @@ public class TrackerApp {
         ArrayList<Transaction> filteredTransactions = new ArrayList<>();
 
         //ask for start date
-        System.out.println("What is the start date?");
+        System.out.println("What is the start date? (yyyy-MM-dd)");
         String startDateInput = scanner.nextLine();
 
 
         //ask for end date
-        System.out.println("What is the end date?");
+        System.out.println("What is the end date? (yyyy-MM-DD)");
         String endDateInput = scanner.nextLine();
 
         //ask for description
@@ -453,8 +461,7 @@ public class TrackerApp {
         System.out.println("What is the amount?");
         String amountInput = scanner.nextLine();
 
-        for (int i = transactions.size() - 1; i >= 0; i--) {
-            Transaction currentTransaction = transactions.get(i);
+        for (Transaction currentTransaction : transactions) {
             filteredTransactions.add(currentTransaction);
         }
         //If start date is blank, then print output
@@ -570,11 +577,10 @@ If end date is blank then print output. If it isn't blank then turn it into a lo
         LocalDate today = LocalDate.now();
         int lastYear = today.getYear() - 1;
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
-        for (int i = transactions.size() - 1; i >= 0; i--) {
-            Transaction transaction = transactions.get(i);
-            int transactionYear = transaction.getDate().getYear();
+        for (Transaction currentTransaction : transactions){
+            int transactionYear = currentTransaction.getDate().getYear();
             if (transactionYear == lastYear) {
-                printTransaction(transaction);
+                printTransaction(currentTransaction);
             }
         }
         pause();
@@ -592,11 +598,9 @@ If end date is blank then print output. If it isn't blank then turn it into a lo
                 return;
             }
 
-            //Searches and reverses the list
-            for (int i = transactions.size() - 1; i >= 0; i--) {
-                Transaction transaction = transactions.get(i);
-                if (vendorName.equalsIgnoreCase(transaction.getVendor())) {
-                    printTransaction(transaction);
+            for (Transaction currentTransaction : transactions){
+                if (vendorName.equalsIgnoreCase(currentTransaction.getVendor())) {
+                    printTransaction(currentTransaction);
                     found = true;
                 }
             }
