@@ -67,7 +67,6 @@ public class LedgerPro {
     }
 
     private static double promptForAmount(String message) {
-
         //// Keep looping as long as the result is just whitespace or empty
 
         while (true) {
@@ -94,7 +93,6 @@ public class LedgerPro {
         }
     }
 
-
     private static void mainMenu() {
         String prompt = """
                                       
@@ -117,7 +115,6 @@ public class LedgerPro {
                 """;
 
         boolean running = true;
-
 
         do {
             System.out.println(prompt);
@@ -196,7 +193,8 @@ public class LedgerPro {
             //skip the header
             bufferedReader.readLine();
             String line = bufferedReader.readLine();
-            //While there is something to read, parse the line, add it to the array list and move on the next line
+            /*While there is something to read, parse the line, add it to the array list and move on the next line. If user accidentally types in extra line in csv file, it will still run
+             */
             while (line != null) {
                 if(!line.isBlank()) {
                     Transaction transaction = parseTransaction(line);
@@ -206,7 +204,6 @@ public class LedgerPro {
                 line = bufferedReader.readLine();
             }
             bufferedReader.close();
-
             //Sorting logic (sort from newest to oldest)
             transactions.sort((t1, t2) -> {
                 // First, compare the dates
@@ -217,8 +214,6 @@ public class LedgerPro {
                 }
                 return dateCompare;
             });
-
-
         } catch (FileNotFoundException fne) {
             System.err.println("File not found: " + fileName);
         } catch (IOException ex) {
@@ -227,7 +222,7 @@ public class LedgerPro {
         }
         return transactions;
     }
-
+    //Splits transactions into parts by pipe
     private static Transaction parseTransaction(String line) {
         //Split line by pipe
         String[] parts = line.split("\\|");
@@ -243,7 +238,7 @@ public class LedgerPro {
         //Returns a transaction object using parameters defined in the Transaction Class
         return new Transaction(date, time, description, vendor, amount);
     }
-
+    //Ledger menu ( Cases )
     private static void ledgerMenu() {
         String prompt = """
                 ╔══════════════════════════════════════════════╗
@@ -264,8 +259,6 @@ public class LedgerPro {
                 """;
         //Initialize a way to end this screen and go back based on user choice
         boolean running = true;
-
-
         do {
             System.out.println(prompt);
             String userMenu = scanner.nextLine().toUpperCase();
@@ -302,10 +295,8 @@ public class LedgerPro {
                     break;
             }
         } while (running);
-
     }
-
-
+    //Displaying the ledger
     private static void displayLedger(String choice) {
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
         for (Transaction currentTransaction : transactions){
@@ -329,7 +320,7 @@ public class LedgerPro {
         }
         pause();
     }
-
+//The report Page
     private static void showReportMenu() {
         String prompt = """
                 ╔══════════════════════════════════════════════╗
