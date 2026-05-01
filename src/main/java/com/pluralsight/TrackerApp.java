@@ -430,142 +430,140 @@ public class TrackerApp {
 
     public static ArrayList<Transaction> customFilters() {
         ArrayList<Transaction> transactions = loadTransactions(TRANSACTIONS_FILE_NAME);
-        ArrayList<Transaction> transactions1 = new ArrayList<>();
+        ArrayList<Transaction> filteredTransactions = new ArrayList<>();
 
         //ask for start date
         System.out.println("What is the start date?");
-        String strDate = scanner.nextLine();
+        String startDateInput = scanner.nextLine();
 
 
         //ask for end date
         System.out.println("What is the end date?");
-        String eDate = scanner.nextLine();
+        String endDateInput = scanner.nextLine();
 
         //ask for description
         System.out.println("What is the description?");
-        String descPrompt = scanner.nextLine();
+        String descriptionInput = scanner.nextLine();
 
         //ask for vendor
         System.out.println("What is the vendor?");
-        String vendPrompt = scanner.nextLine();
+        String vendorInput = scanner.nextLine();
 
         //search for amount
         System.out.println("What is the amount?");
-        String amount = scanner.nextLine();
+        String amountInput = scanner.nextLine();
 
         for (int i = transactions.size() - 1; i >= 0; i--) {
-            Transaction result = transactions.get(i);
-            transactions1.add(result);
+            Transaction currentTransaction = transactions.get(i);
+            filteredTransactions.add(currentTransaction);
         }
         //If start date is blank, then print output
-        if (strDate.isBlank()) {
+        if (startDateInput.isBlank()) {
             System.out.println("No start date applied");
         } else {
             try {
                 //Turn the string into a local date to be able to use for comparing in a condition
-                LocalDate.parse(strDate);
-                transactions1 = filterByStartDate(transactions1, strDate);
+                LocalDate.parse(startDateInput);
+                filteredTransactions = filterByStartDate(filteredTransactions, startDateInput);
             } catch (DateTimeParseException e) {
                 System.err.println("Invalid start date. Skipping start date filter.");
             }
         }
-
-        if (eDate.isBlank()) {
+/*
+If end date is blank then print output. If it isn't blank then turn it into a local date and filter it. If the user doesn't type a valid end date, the terminal catches the error and tells the user that their input was invalid and skips on ahead
+ */
+        if (endDateInput.isBlank()) {
             System.out.println("No end date applied");
         } else {
             try {
-                LocalDate.parse(eDate);
-                transactions1 = filterByEndDate(transactions1, eDate);
+                LocalDate.parse(endDateInput);
+                filteredTransactions = filterByEndDate(filteredTransactions, endDateInput);
             } catch (DateTimeParseException e) {
                 System.err.println("Invalid end date. Skipping end date filter.");
             }
         }
 
-        if (amount.isBlank()) {
+        if (amountInput.isBlank()) {
             System.out.println("No amount applied");
         } else {
             try {
-                Double.parseDouble(amount);
-                transactions1 = filterByAmount(transactions1, amount);
+                Double.parseDouble(amountInput);
+                filteredTransactions = filterByAmount(filteredTransactions, amountInput);
             } catch (NumberFormatException e) {
                 System.err.println("Invalid amount. Skipping amount filter.");
             }
         }
 
-        if (descPrompt.isBlank()) {
+        if (descriptionInput.isBlank()) {
             System.out.println("No description applied");
         } else {
-            transactions1 = filterByDescription(transactions1, descPrompt);
+            filteredTransactions = filterByDescription(filteredTransactions, descriptionInput);
         }
 
-        if (vendPrompt.isBlank()) {
+        if (vendorInput.isBlank()) {
             System.out.println("No vendor applied");
         } else {
-            transactions1 = filterByVendor(transactions1, vendPrompt);
+            filteredTransactions = filterByVendor(filteredTransactions, vendorInput);
         }
 
-
-        for (Transaction transaction : transactions1) {
+        for (Transaction transaction : filteredTransactions) {
             printTransaction(transaction);
         }
         pause();
-        return transactions1;
-
+        return filteredTransactions;
     }
 
-    private static ArrayList<Transaction> filterByVendor(ArrayList<Transaction> result, String prompt) {
-        ArrayList<Transaction> transactions1 = new ArrayList<>();
-        for (Transaction transaction : result) {
-            if (prompt.equalsIgnoreCase(transaction.getVendor())) {
-                transactions1.add(transaction);
+    private static ArrayList<Transaction> filterByVendor(ArrayList<Transaction> transactionsToFilter, String targetVendor) {
+        ArrayList<Transaction> filteredResults = new ArrayList<>();
+        for (Transaction transaction : transactionsToFilter) {
+            if (targetVendor.equalsIgnoreCase(transaction.getVendor())) {
+                filteredResults.add(transaction);
             }
-
         }
-        return transactions1;
+        return filteredResults;
     }
 
-
-    private static ArrayList<Transaction> filterByAmount(ArrayList<Transaction> result, String prompt) {
-        ArrayList<Transaction> transactions1 = new ArrayList<>();
-        double vendPrompt = Double.parseDouble(prompt);
-        for (Transaction transaction : result) {
-            if (Double.compare(vendPrompt, transaction.getAmount()) == 0) {
-                transactions1.add(transaction);
+    private static ArrayList<Transaction> filterByAmount(ArrayList<Transaction> transactionsToFilter, String amountInput) {
+        ArrayList<Transaction> filteredResults = new ArrayList<>();
+        double targetAmount = Double.parseDouble(amountInput);
+        for (Transaction transaction : transactionsToFilter) {
+            if (Double.compare(targetAmount, transaction.getAmount()) == 0) {
+                filteredResults.add(transaction);
             }
         }
-        return transactions1;
+        return filteredResults;
     }
 
-    private static ArrayList<Transaction> filterByDescription(ArrayList<Transaction> result, String prompt) {
-        ArrayList<Transaction> transactions1 = new ArrayList<>();
-        for (Transaction transaction : result) {
-            if (prompt.equalsIgnoreCase(transaction.getDescription())) {
-                transactions1.add(transaction);
+    private static ArrayList<Transaction> filterByDescription(ArrayList<Transaction> transactionsToFilter, String targetDescription) {
+        ArrayList<Transaction> filteredResults = new ArrayList<>();
+        for (Transaction transaction : transactionsToFilter) {
+            if (targetDescription.equalsIgnoreCase(transaction.getDescription())) {
+                filteredResults.add(transaction);
             }
         }
-        return transactions1;
+        return filteredResults;
     }
 
-    private static ArrayList<Transaction> filterByEndDate(ArrayList<Transaction> result, String prompt) {
-        ArrayList<Transaction> transactions1 = new ArrayList<>();
-        LocalDate endDatePrompt = LocalDate.parse(prompt);
-        for (Transaction transaction : result) {
-            if (!endDatePrompt.isBefore(transaction.getDate())) {
-                transactions1.add(transaction);
+    private static ArrayList<Transaction> filterByEndDate(ArrayList<Transaction> transactionsToFilter, String dateInput) {
+        ArrayList<Transaction> filteredResults = new ArrayList<>();
+        LocalDate endDateBoundary = LocalDate.parse(dateInput);
+        for (Transaction transaction : transactionsToFilter) {
+            if (!endDateBoundary.isBefore(transaction.getDate())) {
+                filteredResults.add(transaction);
             }
         }
-        return transactions1;
+        return filteredResults;
     }
 
-    private static ArrayList<Transaction> filterByStartDate(ArrayList<Transaction> result, String prompt) {
-        ArrayList<Transaction> transactions1 = new ArrayList<>();
-        LocalDate startDatePrompt = LocalDate.parse(prompt);
-        for (Transaction transaction : result) {
-            if (!startDatePrompt.isAfter(transaction.getDate())) {
-                transactions1.add(transaction);
+    private static ArrayList<Transaction> filterByStartDate(ArrayList<Transaction> transactionsToFilter, String dateInput) {
+        ArrayList<Transaction> filteredResults = new ArrayList<>();
+        LocalDate startDateBoundary = LocalDate.parse(dateInput);
+        for (Transaction transaction : transactionsToFilter) {
+            if (!startDateBoundary.isAfter(transaction.getDate())) {
+                filteredResults.add(transaction);
             }
         }
-        return transactions1;
+        return filteredResults;
     }
 
     private static void displayPreviousYear() {
@@ -638,11 +636,11 @@ public class TrackerApp {
         pause();
     }
 
-
     private static double getCurrentBalance(ArrayList<Transaction> transactions) {
         double payments = 0.0;
         double deposits = 0.0;
 
+        //While looping the array list, if the amount is negative then append to payments, else add it to deposits
         for (Transaction transaction : transactions) {
             if (transaction.getAmount() < 0) {
                 payments += transaction.getAmount();
@@ -666,7 +664,9 @@ public class TrackerApp {
 
     private static double getTotalPayments(ArrayList<Transaction> transactions) {
         double payments = 0.0;
-
+/*
+While looping through the arraylist, if its a payment append it to the variable and turn the negative sign into a positive
+ */
         for (Transaction transaction : transactions) {
             if (transaction.getAmount() < 0) {
                 payments += Math.abs(transaction.getAmount());
