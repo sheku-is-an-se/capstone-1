@@ -190,7 +190,6 @@ public class TrackerApp {
         ArrayList<Transaction> transactions = new ArrayList<>();
         FileReader fileReader;
         BufferedReader bufferedReader;
-
         try {
             fileReader = new FileReader(fileName);
             bufferedReader = new BufferedReader(fileReader);
