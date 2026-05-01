@@ -198,8 +198,11 @@ public class LedgerPro {
             String line = bufferedReader.readLine();
             //While there is something to read, parse the line, add it to the array list and move on the next line
             while (line != null) {
-                Transaction transaction = parseTransaction(line);
-                transactions.add(transaction);
+                if(!line.isBlank()) {
+                    Transaction transaction = parseTransaction(line);
+                    transactions.add(transaction);
+                }
+                //Get to the next line no matter if it is blank or not
                 line = bufferedReader.readLine();
             }
             bufferedReader.close();
