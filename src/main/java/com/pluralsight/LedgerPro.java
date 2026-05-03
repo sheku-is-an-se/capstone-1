@@ -7,6 +7,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Scanner;
 
 
@@ -205,15 +206,7 @@ public class LedgerPro {
             }
             bufferedReader.close();
             //Sorting logic (sort from newest to oldest)
-            transactions.sort((t1, t2) -> {
-                // First, compare the dates
-                int dateCompare = t2.getDate().compareTo(t1.getDate());
-                if (dateCompare == 0) {
-                    // If the dates are identical, then compare the times
-                    return t2.getTime().compareTo(t1.getTime());
-                }
-                return dateCompare;
-            });
+            transactions.sort(Comparator.comparing(Transaction::getDate).reversed());
         } catch (FileNotFoundException fne) {
             System.err.println("File not found: " + fileName);
         } catch (IOException ex) {
