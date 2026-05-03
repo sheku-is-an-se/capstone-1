@@ -201,7 +201,7 @@ public class LedgerPro {
                     Transaction transaction = parseTransaction(line);
                     transactions.add(transaction);
                 }
-                //Get to the next line no matter if it is blank or not
+                //Get to the next line no matter if it is blank or not.
                 line = bufferedReader.readLine();
             }
             bufferedReader.close();
