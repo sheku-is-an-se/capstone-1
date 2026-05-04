@@ -206,7 +206,8 @@ public class LedgerPro {
             }
             bufferedReader.close();
             //Sorting logic (sort from newest to oldest)
-            transactions.sort(Comparator.comparing(Transaction::getDate).reversed());
+            //without .reversed java will by default sort from oldest to newest
+            transactions.sort(Comparator.comparing(Transaction::getDate).thenComparing(Transaction::getTime).reversed());
         } catch (FileNotFoundException fne) {
             System.err.println("File not found: " + fileName);
         } catch (IOException ex) {
